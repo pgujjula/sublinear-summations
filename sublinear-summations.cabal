@@ -29,9 +29,7 @@ library
   exposed-modules:
       Math.NumberTheory.Summation
   other-modules:
-      Paths_sublinear_summations
-  autogen-modules:
-      Paths_sublinear_summations
+      SublinearSummation.Util
   hs-source-dirs:
       src
   ghc-options: -Wall -Wunused-packages

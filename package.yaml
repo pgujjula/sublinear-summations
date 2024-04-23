@@ -29,3 +29,5 @@ library:
   source-dirs: src
   exposed-modules:
   - Math.NumberTheory.Summation
+  other-modules:
+  - SublinearSummation.Util
