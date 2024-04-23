@@ -3,6 +3,8 @@
 
 module Main (main) where
 
+import Test.Math.NumberTheory.HyperbolicConvolution qualified (tests)
+import Test.Math.NumberTheory.MemoHyper qualified (tests)
 import Test.Math.NumberTheory.Summation qualified (tests)
 import Test.Tasty (TestTree, defaultMain, testGroup)
 
@@ -13,5 +15,7 @@ tests :: TestTree
 tests =
   testGroup
     "sublinear-summations"
-    [ Test.Math.NumberTheory.Summation.tests
+    [ Test.Math.NumberTheory.HyperbolicConvolution.tests,
+      Test.Math.NumberTheory.MemoHyper.tests,
+      Test.Math.NumberTheory.Summation.tests
     ]

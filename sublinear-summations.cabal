@@ -46,6 +46,8 @@ test-suite sublinear-summations-tests
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
+      Test.Math.NumberTheory.HyperbolicConvolution
+      Test.Math.NumberTheory.MemoHyper
       Test.Math.NumberTheory.Summation
       Test.Util
       Paths_sublinear_summations
