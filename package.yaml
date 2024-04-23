@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: Copyright Preetham Gujjula
+# SPDX-License-Identifier: BSD-3-Clause
+name:        sublinear-summations
+version:     0.0.0.0
+synopsis:    Compute number theoretic summations in sublinear time
+description: Please see the README on GitHub at <https://github.com/pgujjula/sublinear-summations#readme>
+category:    Math
+stability:   experimental
+github:      "pgujjula/sublinear-summations"
+author:      "Preetham Gujjula"
+maintainer:  "Preetham Gujjula <libraries@mail.preetham.io>"
+copyright:   "Preetham Gujjula"
+license:     BSD-3-Clause
+
+language: GHC2021
+
+extra-doc-files:
+- README.md
+- ChangeLog.md
+
+ghc-options:
+- -Wall
+- -Wunused-packages
+
+dependencies:
+- base ^>= {4.16, 4.17, 4.18, 4.19}
+
+library:
+  source-dirs: src
+  exposed-modules:
+  - Math.NumberTheory.Summation

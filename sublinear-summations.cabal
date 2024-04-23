@@ -1,0 +1,40 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.36.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           sublinear-summations
+version:        0.0.0.0
+synopsis:       Compute number theoretic summations in sublinear time
+description:    Please see the README on GitHub at <https://github.com/pgujjula/sublinear-summations#readme>
+category:       Math
+stability:      experimental
+homepage:       https://github.com/pgujjula/sublinear-summations#readme
+bug-reports:    https://github.com/pgujjula/sublinear-summations/issues
+author:         Preetham Gujjula
+maintainer:     Preetham Gujjula <libraries@mail.preetham.io>
+copyright:      Preetham Gujjula
+license:        BSD-3-Clause
+build-type:     Simple
+extra-doc-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/pgujjula/sublinear-summations
+
+library
+  exposed-modules:
+      Math.NumberTheory.Summation
+  other-modules:
+      Paths_sublinear_summations
+  autogen-modules:
+      Paths_sublinear_summations
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wunused-packages
+  build-depends:
+      base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
+  default-language: GHC2021
