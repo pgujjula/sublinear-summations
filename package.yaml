@@ -30,7 +30,9 @@ library:
   exposed-modules:
   - Math.NumberTheory.Summation
   - Math.NumberTheory.HyperbolicConvolution
+  - Math.NumberTheory.MemoHyper
   other-modules:
   - SublinearSummation.Util
   dependencies:
   - integer-roots
+  - vector

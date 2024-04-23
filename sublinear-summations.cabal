@@ -29,6 +29,7 @@ library
   exposed-modules:
       Math.NumberTheory.Summation
       Math.NumberTheory.HyperbolicConvolution
+      Math.NumberTheory.MemoHyper
   other-modules:
       SublinearSummation.Util
   hs-source-dirs:
@@ -37,4 +38,5 @@ library
   build-depends:
       base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
     , integer-roots
+    , vector
   default-language: GHC2021
