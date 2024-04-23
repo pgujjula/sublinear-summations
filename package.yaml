@@ -29,5 +29,8 @@ library:
   source-dirs: src
   exposed-modules:
   - Math.NumberTheory.Summation
+  - Math.NumberTheory.HyperbolicConvolution
   other-modules:
   - SublinearSummation.Util
+  dependencies:
+  - integer-roots

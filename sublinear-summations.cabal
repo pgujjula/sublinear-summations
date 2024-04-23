@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Math.NumberTheory.Summation
+      Math.NumberTheory.HyperbolicConvolution
   other-modules:
       SublinearSummation.Util
   hs-source-dirs:
@@ -35,4 +36,5 @@ library
   ghc-options: -Wall -Wunused-packages
   build-depends:
       base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
+    , integer-roots
   default-language: GHC2021
