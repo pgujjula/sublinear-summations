@@ -38,6 +38,7 @@ library
   build-depends:
       base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
     , integer-roots
+    , placeholder
     , vector
   default-language: GHC2021
 
@@ -46,6 +47,7 @@ test-suite sublinear-summations-tests
   main-is: Main.hs
   other-modules:
       Test.Math.NumberTheory.Summation
+      Test.Util
       Paths_sublinear_summations
   autogen-modules:
       Paths_sublinear_summations
@@ -55,4 +57,6 @@ test-suite sublinear-summations-tests
   build-depends:
       base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
     , tasty
+    , tasty-expected-failure
+    , tasty-hunit
   default-language: GHC2021

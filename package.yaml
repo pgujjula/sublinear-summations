@@ -35,6 +35,7 @@ library:
   - SublinearSummation.Util
   dependencies:
   - integer-roots
+  - placeholder
   - vector
 
 tests:
@@ -44,3 +45,5 @@ tests:
     main: Main.hs
     dependencies:
     - tasty
+    - tasty-expected-failure
+    - tasty-hunit

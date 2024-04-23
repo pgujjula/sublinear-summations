@@ -4,6 +4,7 @@
 module Test.Math.NumberTheory.Summation (tests) where
 
 import Test.Tasty (TestTree, testGroup)
+import Test.Util (todoTest)
 
 tests :: TestTree
 tests =
@@ -33,33 +34,33 @@ tests =
 --
 
 sumNumDivisorsTests :: TestTree
-sumNumDivisorsTests = undefined
+sumNumDivisorsTests = todoTest "sumNumDivisors"
 
 sumSumDivisorsTests :: TestTree
-sumSumDivisorsTests = undefined
+sumSumDivisorsTests = todoTest "sumSumDivisors"
 
 sumTotientTests :: TestTree
-sumTotientTests = undefined
+sumTotientTests = todoTest "sumTotient"
 
 --
 -- Primes
 --
 
 primePiTests :: TestTree
-primePiTests = undefined
+primePiTests = todoTest "primePi"
 
 primeSumTests :: TestTree
-primeSumTests = undefined
+primeSumTests = todoTest "primeSum"
 
 --
 -- Square-free integers
 --
 
 mertensTests :: TestTree
-mertensTests = undefined
+mertensTests = todoTest "mertens"
 
 numSquarefreeTests :: TestTree
-numSquarefreeTests = undefined
+numSquarefreeTests = todoTest "numSquarefree"
 
 sumSquarefreeTests :: TestTree
-sumSquarefreeTests = undefined
+sumSquarefreeTests = todoTest "sumSquarefree"

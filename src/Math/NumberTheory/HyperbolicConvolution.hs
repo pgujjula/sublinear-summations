@@ -32,6 +32,7 @@ module Math.NumberTheory.HyperbolicConvolution
 where
 
 import Control.Applicative (liftA2)
+import Control.Placeholder (todo)
 import Math.NumberTheory.Roots (integerSquareRoot)
 
 -- | @'hyper' n f k = f (n \`'quot'\` k)@
@@ -112,7 +113,7 @@ hyperConvolveMobiusFast ::
   (Word -> b) ->
   Word ->
   b
-hyperConvolveMobiusFast = undefined
+hyperConvolveMobiusFast = todo
 {-# INLINE hyperConvolveMobiusFast #-}
 
 -- hyperConvolveFastM ::
