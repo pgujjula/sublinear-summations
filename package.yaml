@@ -47,3 +47,13 @@ tests:
     - tasty
     - tasty-expected-failure
     - tasty-hunit
+
+benchmarks:
+  apply-merge-benchmarks:
+    source-dirs:
+    - bench
+    main: Main.hs
+    dependencies:
+    - tasty-bench
+    - tasty-expected-failure
+    - tasty-hunit
