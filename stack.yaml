@@ -6,6 +6,10 @@ resolver: lts-21.25
 packages:
 - .
 
+build:
+  benchmark-opts:
+    benchmark-arguments: "--color always"
+
 extra-deps:
 - github: ekmett/placeholder
   commit: c958c36aed3c102cc6085b9126faee704fefc1b5
