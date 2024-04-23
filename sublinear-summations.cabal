@@ -40,3 +40,19 @@ library
     , integer-roots
     , vector
   default-language: GHC2021
+
+test-suite sublinear-summations-tests
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      Test.Math.NumberTheory.Summation
+      Paths_sublinear_summations
+  autogen-modules:
+      Paths_sublinear_summations
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wunused-packages
+  build-depends:
+      base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
+    , tasty
+  default-language: GHC2021

@@ -36,3 +36,11 @@ library:
   dependencies:
   - integer-roots
   - vector
+
+tests:
+  sublinear-summations-tests:
+    source-dirs:
+    - test
+    main: Main.hs
+    dependencies:
+    - tasty
