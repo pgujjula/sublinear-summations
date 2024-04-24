@@ -143,7 +143,7 @@ memoHyperDirect fh n =
 -- provided @'Math.NumberTheory.HyperbolicConvolution.hyper' n f@, a list of
 -- small values of @g@.
 memoHyperSigmaHyper ::
-  (Integral b) => (Word -> b) -> [b] -> Word -> VMemoHyper b
+  (G.Vector v b, Integral b) => (Word -> b) -> [b] -> Word -> MemoHyper v b
 memoHyperSigmaHyper = todo
 
 -- | Given \(f : \mathbb{N}^{+} \to \mathbf{B}\), define
@@ -153,7 +153,7 @@ memoHyperSigmaHyper = todo
 -- \(x \mapsto g \left(\left\lfloor \frac{n}{x} \right\rfloor\right)\),
 -- when provided @f@, and a list of small values of @g@.
 memoHyperSigmaMobiusHyper ::
-  (Integral b) => (Word -> b) -> [b] -> Word -> VMemoHyper b
+  (G.Vector v b, Integral b) => (Word -> b) -> [b] -> Word -> MemoHyper v b
 memoHyperSigmaMobiusHyper = todo
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.mertens'.
