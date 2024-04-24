@@ -34,6 +34,7 @@ library
       Math.NumberTheory.Summation
       Math.NumberTheory.HyperbolicConvolution
       Math.NumberTheory.MemoHyper
+      Math.NumberTheory.MemoHyper.Mutable
       Math.NumberTheory.Mobius
       SublinearSummation.Util
   other-modules:
@@ -46,6 +47,7 @@ library
   build-depends:
       apply-merge
     , base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
+    , call-stack
     , chimera
     , data-ordlist
     , infinite-list

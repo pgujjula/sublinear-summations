@@ -36,10 +36,12 @@ library:
   - Math.NumberTheory.Summation
   - Math.NumberTheory.HyperbolicConvolution
   - Math.NumberTheory.MemoHyper
+  - Math.NumberTheory.MemoHyper.Mutable
   - Math.NumberTheory.Mobius
   - SublinearSummation.Util
   dependencies:
   - apply-merge
+  - call-stack
   - chimera
   - data-ordlist
   - infinite-list
