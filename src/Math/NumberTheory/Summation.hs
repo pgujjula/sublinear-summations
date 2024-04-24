@@ -31,6 +31,7 @@ import Data.Function ((&))
 import Data.List.ApplyMerge (applyMerge)
 import Data.List.Ordered (minus)
 import Math.NumberTheory.HyperbolicConvolution (diff, hyper, hyperConvolveFast)
+import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (word2Int)
 
 --
@@ -111,12 +112,6 @@ mobiuses =
       composites :: [Word]
       composites = applyMerge (\p i -> p * (p + i)) primes [0 ..]
 
-      squarefrees :: [Word]
-      squarefrees = [1 ..] `minus` applyMerge (*) squares [1 ..]
-        where
-          squares :: [Word]
-          squares = map (\x -> x * x) [2 ..]
-
       isSquarefrees :: [Int]
       isSquarefrees = go 1 squarefrees
         where
@@ -164,9 +159,24 @@ primeSum = todo
 mertens :: (Integral a) => a -> a
 mertens = todo
 
+squares :: [Word]
+squares = map (^ (2 :: Int)) [1 ..]
+
+squarefrees :: [Word]
+squarefrees = [1 ..] `minus` applyMerge (*) (tail squares) [1 ..]
+
 -- | The number of square-free integers ≤ @n@.
 numSquarefree :: (Integral a) => a -> a
-numSquarefree = todo
+numSquarefree n =
+  let n' :: Word
+      n' = fromIntegral (max 0 n)
+
+      sq :: Word
+      sq = integerSquareRoot n'
+   in fromIntegral $
+        sum $
+          flip map (takeWhile (<= sq) squarefrees) $ \i ->
+            mobius' i * fromIntegral (n' `quot` (i * i))
 
 -- | The sum of the square-free integers ≤ @n@.
 sumSquarefree :: (Integral a) => a -> a

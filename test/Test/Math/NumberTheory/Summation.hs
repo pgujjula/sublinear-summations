@@ -5,7 +5,12 @@ module Test.Math.NumberTheory.Summation (tests) where
 
 import Control.Monad (forM_)
 import Data.List (genericLength)
-import Math.NumberTheory.Summation (sumNumDivisors, sumSumDivisors, sumTotient)
+import Math.NumberTheory.Summation
+  ( numSquarefree,
+    sumNumDivisors,
+    sumSumDivisors,
+    sumTotient,
+  )
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase)
 import Test.Util (todoTest)
@@ -95,8 +100,19 @@ primeSumTests = todoTest "primeSum"
 mertensTests :: TestTree
 mertensTests = todoTest "mertens"
 
+isSquarefreeNaive :: (Integral a) => a -> Bool
+isSquarefreeNaive n =
+  let squares = map (^ (2 :: Int)) [1 ..]
+   in not (any (`divides` n) (takeWhile (<= n) (tail squares)))
+
+numSquarefreeNaive :: (Integral a) => a -> a
+numSquarefreeNaive n = genericLength (filter isSquarefreeNaive [1 .. n])
+
 numSquarefreeTests :: TestTree
-numSquarefreeTests = todoTest "numSquarefree"
+numSquarefreeTests =
+  testCase "numSquarefree" $ do
+    forM_ [(-10 :: Int) .. 1000] $ \n ->
+      assertEqual (show n) (numSquarefree n) (numSquarefreeNaive n)
 
 sumSquarefreeTests :: TestTree
 sumSquarefreeTests = todoTest "sumSquarefree"

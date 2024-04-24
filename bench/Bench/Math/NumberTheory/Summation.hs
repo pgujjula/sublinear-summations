@@ -4,7 +4,12 @@
 module Bench.Math.NumberTheory.Summation (benchmarks) where
 
 import Bench.Util (todoBenchmark)
-import Math.NumberTheory.Summation (sumNumDivisors, sumSumDivisors, sumTotient)
+import Math.NumberTheory.Summation
+  ( numSquarefree,
+    sumNumDivisors,
+    sumSumDivisors,
+    sumTotient,
+  )
 import Test.Tasty.Bench (Benchmark, bench, bgroup, nf)
 
 benchmarks :: Benchmark
@@ -70,7 +75,10 @@ mertensBenchmarks :: Benchmark
 mertensBenchmarks = todoBenchmark "mertens"
 
 numSquarefreeBenchmarks :: Benchmark
-numSquarefreeBenchmarks = todoBenchmark "numSquarefree"
+numSquarefreeBenchmarks =
+  bgroup "numSquarefree" $ flip map [(1 :: Int) .. 12] $ \i ->
+    bench ("10^" ++ show i) $
+      nf numSquarefree (10 ^ i :: Int)
 
 sumSquarefreeBenchmarks :: Benchmark
 sumSquarefreeBenchmarks = todoBenchmark "sumSquarefree"
