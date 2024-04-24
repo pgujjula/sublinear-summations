@@ -24,6 +24,7 @@ module Math.NumberTheory.Summation
 where
 
 import Control.Placeholder (todo)
+import Math.NumberTheory.HyperbolicConvolution (hyperConvolveFast)
 
 --
 -- Divisor functions
@@ -32,7 +33,14 @@ import Control.Placeholder (todo)
 -- | Let \(τ(n)\) be the number of positive divisors of @n@. Then
 -- @'sumNumDivisors' n@ is the sum of \(τ\) from @1@ to @n@.
 sumNumDivisors :: (Integral a) => a -> a
-sumNumDivisors n = sum (map (\k -> n `quot` k) [1 .. n])
+sumNumDivisors n =
+  let n' :: Word
+      n' = fromIntegral n
+   in fromIntegral
+        . hyperConvolveFast (const 1) (n' `quot`) (const 1) (n' `quot`)
+        . fromIntegral
+        . max 0
+        $ n
 
 -- | Let \(σ(n)\) be the sum of the positive divisors of @n@. Then
 -- @'sumSumDivisors' n@ is the sum of \(σ\) from @1@ to @n@.
