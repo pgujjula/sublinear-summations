@@ -13,3 +13,5 @@ build:
 extra-deps:
 - github: ekmett/placeholder
   commit: c958c36aed3c102cc6085b9126faee704fefc1b5
+- apply-merge-0.1.0.0
+- chimera-0.4.1.0

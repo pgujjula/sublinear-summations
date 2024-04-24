@@ -41,6 +41,9 @@ library:
   other-modules:
   - SublinearSummation.Util
   dependencies:
+  - apply-merge
+  - chimera
+  - data-ordlist
   - integer-roots
   - placeholder
   - vector

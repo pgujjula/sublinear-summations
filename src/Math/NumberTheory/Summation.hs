@@ -25,7 +25,13 @@ where
 
 import Control.Placeholder (todo)
 import Data.Bits (shiftR)
-import Math.NumberTheory.HyperbolicConvolution (hyperConvolveFast)
+import Data.Chimera (UChimera)
+import Data.Chimera qualified as Chimera
+import Data.Function ((&))
+import Data.List.ApplyMerge (applyMerge)
+import Data.List.Ordered (minus)
+import Math.NumberTheory.HyperbolicConvolution (diff, hyper, hyperConvolveFast)
+import SublinearSummation.Util (word2Int)
 
 --
 -- Divisor functions
@@ -64,7 +70,79 @@ sumSumDivisors n =
 -- i.e., the number of positive integers ≤ @n@ that are relatively prime to @n@.
 -- Then @'sumTotient' n@ is the sum of \(φ\) from @1@ to @n@.
 sumTotient :: (Integral a) => a -> a
-sumTotient = todo
+sumTotient n =
+  let n' :: Word
+      n' = fromIntegral (max 0 n)
+
+      square :: Word -> Int
+      square x = let x' = word2Int x in x' * x'
+      {-# INLINE square #-}
+
+      s =
+        fromIntegral $
+          hyperConvolveFast
+            mobius'
+            (hyper n' mertens')
+            (diff square)
+            (hyper n' square)
+            n'
+   in (s + 1) `quot` 2
+{-# INLINE sumTotient #-}
+
+mobius' :: Word -> Int
+mobius' n = Chimera.index mobiusChimera (n - 1)
+{-# INLINE mobius' #-}
+
+mertens' :: Word -> Int
+mertens' n = Chimera.index mertensChimera (n - 1)
+{-# INLINE mertens' #-}
+
+mobiusChimera :: UChimera Int
+mobiusChimera = Chimera.fromListWithDef 0 mobiuses
+
+mertensChimera :: UChimera Int
+mertensChimera = Chimera.fromListWithDef 0 mertenses
+
+mobiuses :: [Int]
+mobiuses =
+  let primes :: [Word]
+      primes = 2 : ([3 ..] `minus` composites)
+
+      composites :: [Word]
+      composites = applyMerge (\p i -> p * (p + i)) primes [0 ..]
+
+      squarefrees :: [Word]
+      squarefrees = [1 ..] `minus` applyMerge (*) squares [1 ..]
+        where
+          squares :: [Word]
+          squares = map (\x -> x * x) [2 ..]
+
+      isSquarefrees :: [Int]
+      isSquarefrees = go 1 squarefrees
+        where
+          go :: Word -> [Word] -> [Int]
+          go x (y : ys) =
+            if x == y
+              then 1 : go (x + 1) ys
+              else 0 : go (x + 1) (y : ys)
+          go _ _ = error "impossible"
+
+      countUp :: [Word] -> [(Word, Int)]
+      countUp = go 1 0
+        where
+          go :: Word -> Int -> [Word] -> [(Word, Int)]
+          go x !i (y : ys) =
+            if x == y
+              then go x (i + 1) ys
+              else (x, i) : go (x + 1) 0 (y : ys)
+          go _ _ _ = error "impossible"
+   in applyMerge (*) primes [1 ..]
+        & countUp
+        & map (\(_, n) -> if even n then 1 else -1)
+        & zipWith (*) isSquarefrees
+
+mertenses :: [Int]
+mertenses = scanl1 (+) mobiuses
 
 --
 -- Primes

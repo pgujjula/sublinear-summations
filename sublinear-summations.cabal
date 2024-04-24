@@ -40,7 +40,10 @@ library
       src
   ghc-options: -Wall -Wunused-packages
   build-depends:
-      base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
+      apply-merge
+    , base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
+    , chimera
+    , data-ordlist
     , integer-roots
     , placeholder
     , vector
