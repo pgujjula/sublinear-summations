@@ -8,7 +8,7 @@ import Data.List (genericLength)
 import Math.NumberTheory.Summation (sumNumDivisors)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase)
-import Test.Util (todoTest, todoCode)
+import Test.Util (todoTest)
 
 tests :: TestTree
 tests =
@@ -47,10 +47,9 @@ sumNumDivisorsNaive n = sum (map numDivisorsNaive [1 .. n])
 
 sumNumDivisorsTests :: TestTree
 sumNumDivisorsTests =
-  todoCode $
-    testCase "sumNumDivisors" $ do
-      forM_ [(-10 :: Int) .. 100] $ \n ->
-        assertEqual (show n) (sumNumDivisors n) (sumNumDivisorsNaive n)
+  testCase "sumNumDivisors" $ do
+    forM_ [(-10 :: Int) .. 100] $ \n ->
+      assertEqual (show n) (sumNumDivisors n) (sumNumDivisorsNaive n)
 
 sumSumDivisorsTests :: TestTree
 sumSumDivisorsTests = todoTest "sumSumDivisors"
