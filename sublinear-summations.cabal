@@ -85,6 +85,7 @@ benchmark apply-merge-benchmarks
   ghc-options: -Wall -Wunused-packages
   build-depends:
       base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
+    , sublinear-summations
     , tasty-bench
     , tasty-expected-failure
     , tasty-hunit

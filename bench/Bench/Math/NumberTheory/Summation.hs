@@ -4,7 +4,8 @@
 module Bench.Math.NumberTheory.Summation (benchmarks) where
 
 import Bench.Util (todoBenchmark)
-import Test.Tasty.Bench (Benchmark, bgroup)
+import Math.NumberTheory.Summation (sumNumDivisors)
+import Test.Tasty.Bench (Benchmark, bench, bgroup, nf)
 
 benchmarks :: Benchmark
 benchmarks =
@@ -34,7 +35,10 @@ benchmarks =
 --
 
 sumNumDivisorsBenchmarks :: Benchmark
-sumNumDivisorsBenchmarks = todoBenchmark "sumNumDivisors"
+sumNumDivisorsBenchmarks =
+  bgroup "sumNumDivisors" $ flip map [(1 :: Int) .. 12] $ \i ->
+    bench ("10^" ++ show i) $
+      nf sumNumDivisors (10 ^ i :: Int)
 
 sumSumDivisorsBenchmarks :: Benchmark
 sumSumDivisorsBenchmarks = todoBenchmark "sumSumDivisors"
