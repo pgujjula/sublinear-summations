@@ -3,7 +3,10 @@
 
 module Test.Math.NumberTheory.HyperbolicConvolution (tests) where
 
+import Math.NumberTheory.HyperbolicConvolution (hyper)
+import Math.NumberTheory.Roots (integerSquareRoot)
 import Test.Tasty (TestTree, testGroup)
+import Test.Tasty.HUnit (testCase, (@?=))
 import Test.Util (todoTest)
 
 tests :: TestTree
@@ -30,7 +33,16 @@ tests =
 --
 
 hyperTests :: TestTree
-hyperTests = todoTest "hyper"
+hyperTests =
+  testGroup
+    "hyper"
+    [ testCase "id" $
+        map (hyper 10 id) [1 .. 10]
+          @?= [10, 5, 3, 2, 2, 1, 1, 1, 1, 1],
+      testCase "integerSquareRoot" $
+        map (hyper 10 integerSquareRoot) [1 .. 10]
+          @?= [3, 2, 1, 1, 1, 1, 1, 1, 1, 1]
+    ]
 
 sigmaTests :: TestTree
 sigmaTests = todoTest "sigma"

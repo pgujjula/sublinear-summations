@@ -44,6 +44,8 @@ tests:
     - test
     main: Main.hs
     dependencies:
+    - integer-roots
+    - sublinear-summations
     - tasty
     - tasty-expected-failure
     - tasty-hunit
