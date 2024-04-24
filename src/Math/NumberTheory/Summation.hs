@@ -180,4 +180,16 @@ numSquarefree n =
 
 -- | The sum of the square-free integers ≤ @n@.
 sumSquarefree :: (Integral a) => a -> a
-sumSquarefree = todo
+sumSquarefree n =
+  let n' :: Word
+      n' = fromIntegral (max 0 n)
+
+      sq :: Word
+      sq = integerSquareRoot n'
+
+      f :: Word -> Int
+      f k = let k' = word2Int k in (k' * (k' + 1)) `quot` 2
+   in fromIntegral $
+        sum $
+          flip map (takeWhile (<= sq) squarefrees) $ \i ->
+            mobius' i * word2Int (i * i) * f (n' `quot` (i * i))

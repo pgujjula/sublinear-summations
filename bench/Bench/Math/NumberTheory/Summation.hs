@@ -7,6 +7,7 @@ import Bench.Util (todoBenchmark)
 import Math.NumberTheory.Summation
   ( numSquarefree,
     sumNumDivisors,
+    sumSquarefree,
     sumSumDivisors,
     sumTotient,
   )
@@ -81,4 +82,7 @@ numSquarefreeBenchmarks =
       nf numSquarefree (10 ^ i :: Int)
 
 sumSquarefreeBenchmarks :: Benchmark
-sumSquarefreeBenchmarks = todoBenchmark "sumSquarefree"
+sumSquarefreeBenchmarks =
+  bgroup "sumSquarefree" $ flip map [(1 :: Int) .. 12] $ \i ->
+    bench ("10^" ++ show i) $
+      nf sumSquarefree (10 ^ i :: Int)

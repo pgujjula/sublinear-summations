@@ -8,6 +8,7 @@ import Data.List (genericLength)
 import Math.NumberTheory.Summation
   ( numSquarefree,
     sumNumDivisors,
+    sumSquarefree,
     sumSumDivisors,
     sumTotient,
   )
@@ -108,6 +109,9 @@ isSquarefreeNaive n =
 numSquarefreeNaive :: (Integral a) => a -> a
 numSquarefreeNaive n = genericLength (filter isSquarefreeNaive [1 .. n])
 
+sumSquarefreeNaive :: (Integral a) => a -> a
+sumSquarefreeNaive n = sum (filter isSquarefreeNaive [1 .. n])
+
 numSquarefreeTests :: TestTree
 numSquarefreeTests =
   testCase "numSquarefree" $ do
@@ -115,4 +119,7 @@ numSquarefreeTests =
       assertEqual (show n) (numSquarefree n) (numSquarefreeNaive n)
 
 sumSquarefreeTests :: TestTree
-sumSquarefreeTests = todoTest "sumSquarefree"
+sumSquarefreeTests =
+  testCase "sumSquarefree" $ do
+    forM_ [(-10 :: Int) .. 1000] $ \n ->
+      assertEqual (show n) (sumSquarefree n) (sumSquarefreeNaive n)
