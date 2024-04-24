@@ -18,8 +18,7 @@ copyright:      Preetham Gujjula
 license:        BSD-3-Clause
 build-type:     Simple
 tested-with:
-    GHC == 9.4.8
-  , GHC == 9.6.5
+    GHC == 9.6.5
   , GHC == 9.8.2
 extra-doc-files:
     README.md

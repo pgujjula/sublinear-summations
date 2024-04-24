@@ -51,6 +51,8 @@ jobs:
           path: ~/.cabal/store
           key: ${{ runner.os }}-${{ matrix.ghc }}-${{ github.sha }}
           restore-keys: ${{ runner.os }}-${{ matrix.ghc }}
+      - name: Install primesieve C library
+        run: sudo apt-get install -y libprimesieve-dev
       - name: Run cabal configure
         run: cabal configure
           --enable-tests

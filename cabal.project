@@ -6,3 +6,9 @@ source-repository-package
   type: git
   location: https://github.com/ekmett/placeholder.git
   tag: c958c36aed3c102cc6085b9126faee704fefc1b5
+
+source-repository-package
+  type: git
+  location: https://github.com/sighingnow/computations.git
+  tag: cdd92c7c20a677282a7db3545a956494f3d61762
+  subdir: primesieve
