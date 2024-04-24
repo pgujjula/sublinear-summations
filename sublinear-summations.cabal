@@ -67,6 +67,8 @@ benchmark apply-merge-benchmarks
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
+      Bench.Math.NumberTheory.HyperbolicConvolution
+      Bench.Math.NumberTheory.MemoHyper
       Bench.Math.NumberTheory.Summation
       Bench.Util
       Paths_sublinear_summations
