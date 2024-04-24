@@ -1,7 +1,7 @@
 -- SPDX-FileCopyrightText: Copyright Preetham Gujjula
 -- SPDX-License-Identifier: BSD-3-Clause
 
-module Test.Util (todoTest) where
+module Test.Util (todoTest, todoCode) where
 
 import Test.Tasty (TestTree)
 import Test.Tasty.ExpectedFailure (expectFailBecause)
@@ -11,3 +11,6 @@ todoTest :: (HasCallStack) => String -> TestTree
 todoTest message =
   expectFailBecause "unimplemented test" $
     testCase message (assertFailure "")
+
+todoCode :: (HasCallStack) => TestTree -> TestTree
+todoCode = expectFailBecause "unimplemented code"
