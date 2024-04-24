@@ -14,6 +14,13 @@ license:     BSD-3-Clause
 
 language: GHC2021
 
+# Can test with more versions of GHC before 9.4 once we don't depend on
+# placeholder
+tested-with:
+- GHC == 9.4.8
+- GHC == 9.6.5
+- GHC == 9.8.2
+
 extra-doc-files:
 - README.md
 - ChangeLog.md
