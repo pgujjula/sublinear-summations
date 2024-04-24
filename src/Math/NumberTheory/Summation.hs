@@ -24,6 +24,7 @@ module Math.NumberTheory.Summation
 where
 
 import Control.Placeholder (todo)
+import Data.Bits (shiftR)
 import Math.NumberTheory.HyperbolicConvolution (hyperConvolveFast)
 
 --
@@ -45,7 +46,18 @@ sumNumDivisors n =
 -- | Let \(σ(n)\) be the sum of the positive divisors of @n@. Then
 -- @'sumSumDivisors' n@ is the sum of \(σ\) from @1@ to @n@.
 sumSumDivisors :: (Integral a) => a -> a
-sumSumDivisors = todo
+sumSumDivisors n =
+  let n' :: Word
+      n' = fromIntegral n
+      hyper_sigma_f :: Word -> Word
+      hyper_sigma_f k =
+        let i = n' `quot` k
+         in (i * (i + 1)) `shiftR` 1
+   in fromIntegral
+        . hyperConvolveFast id hyper_sigma_f (const 1) (n' `quot`)
+        . fromIntegral
+        . max 0
+        $ n
 
 -- | Let \(φ(n)\) be
 -- [Euler's totient function](https://en.wikipedia.org/wiki/Euler%27s_totient_function),

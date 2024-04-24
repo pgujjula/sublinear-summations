@@ -5,7 +5,7 @@ module Test.Math.NumberTheory.Summation (tests) where
 
 import Control.Monad (forM_)
 import Data.List (genericLength)
-import Math.NumberTheory.Summation (sumNumDivisors)
+import Math.NumberTheory.Summation (sumNumDivisors, sumSumDivisors)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase)
 import Test.Util (todoTest)
@@ -51,8 +51,17 @@ sumNumDivisorsTests =
     forM_ [(-10 :: Int) .. 100] $ \n ->
       assertEqual (show n) (sumNumDivisors n) (sumNumDivisorsNaive n)
 
+sumDivisorsNaive :: (Integral a) => a -> a
+sumDivisorsNaive n = sum (filter (`divides` n) [1 .. n])
+
+sumSumDivisorsNaive :: (Integral a) => a -> a
+sumSumDivisorsNaive n = sum (map sumDivisorsNaive [1 .. n])
+
 sumSumDivisorsTests :: TestTree
-sumSumDivisorsTests = todoTest "sumSumDivisors"
+sumSumDivisorsTests =
+  testCase "sumSumDivisors" $ do
+    forM_ [(-10 :: Int) .. 100] $ \n ->
+      assertEqual (show n) (sumSumDivisors n) (sumSumDivisorsNaive n)
 
 sumTotientTests :: TestTree
 sumTotientTests = todoTest "sumTotient"
