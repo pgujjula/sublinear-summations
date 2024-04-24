@@ -3,6 +3,8 @@
 
 module SublinearSummation.Util (word2Int, int2Word) where
 
+import Control.Placeholder (todo)
+
 word2Int :: Word -> Int
 word2Int = fromIntegral
 {-# INLINE word2Int #-}
@@ -10,3 +12,6 @@ word2Int = fromIntegral
 int2Word :: Int -> Word
 int2Word = fromIntegral
 {-# INLINE int2Word #-}
+
+primes :: [Int]
+primes = todo
