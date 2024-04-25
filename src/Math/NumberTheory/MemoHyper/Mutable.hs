@@ -9,7 +9,7 @@
 --
 -- Mutable MemoHypers.
 module Math.NumberTheory.MemoHyper.Mutable
-  ( MMemoHyper,
+  ( MMemoHyper (..),
 
     -- * Accessors
     readHyper,

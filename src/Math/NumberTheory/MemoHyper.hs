@@ -29,6 +29,10 @@ module Math.NumberTheory.MemoHyper
     memoHyperSigmaHyper,
     memoHyperSigmaMobiusHyper,
 
+    -- * Conversion
+    freeze,
+    unsafeFreeze,
+
     -- * @'MemoHyper'@ for arithmetic functions
 
     -- ** Divisor functions
@@ -49,9 +53,11 @@ where
 
 import Control.Placeholder (todo)
 import Data.Vector qualified as V
-import Data.Vector.Generic ((!))
+import Data.Vector.Generic (Mutable, (!))
 import Data.Vector.Generic qualified as G
+import Data.Vector.Generic.Mutable (PrimMonad, PrimState)
 import Data.Vector.Unboxed qualified as U
+import Math.NumberTheory.MemoHyper.Mutable (MMemoHyper (..))
 import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (word2Int)
 
@@ -155,6 +161,41 @@ memoHyperSigmaHyper = todo
 memoHyperSigmaMobiusHyper ::
   (G.Vector v b, Integral b) => (Word -> b) -> [b] -> Word -> MemoHyper v b
 memoHyperSigmaMobiusHyper = todo
+
+-- | Convert a 'MMemoHyper' to 'MemoHyper' by copying.
+freeze ::
+  (PrimMonad m, G.Vector v a) =>
+  MMemoHyper (Mutable v) (PrimState m) a ->
+  m (MemoHyper v a)
+freeze mmh = do
+  funcVec <- G.freeze (mmhFuncVec mmh)
+  hyperVec <- G.freeze (mmhHyperVec mmh)
+  let mh =
+        MemoHyper
+          { mhLimit = mmhLimit mmh,
+            mhSqrtLimit = mmhSqrtLimit mmh,
+            mhFuncVec = funcVec,
+            mhHyperVec = hyperVec
+          }
+  pure mh
+
+-- | Convert a 'MMemoHyper' to 'MemoHyper' without copying. The 'MMemoHyper'
+-- cannot be used after this operation.
+unsafeFreeze ::
+  (PrimMonad m, G.Vector v a) =>
+  MMemoHyper (Mutable v) (PrimState m) a ->
+  m (MemoHyper v a)
+unsafeFreeze mmh = do
+  funcVec <- G.unsafeFreeze (mmhFuncVec mmh)
+  hyperVec <- G.unsafeFreeze (mmhHyperVec mmh)
+  let mh =
+        MemoHyper
+          { mhLimit = mmhLimit mmh,
+            mhSqrtLimit = mmhSqrtLimit mmh,
+            mhFuncVec = funcVec,
+            mhHyperVec = hyperVec
+          }
+  pure mh
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.mertens'.
 memoHyperMertens :: (G.Vector v a, Integral a) => Word -> MemoHyper v a
