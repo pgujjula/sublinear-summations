@@ -4,9 +4,14 @@
 module Test.Math.NumberTheory.Mobius (tests) where
 
 import Control.Monad (forM_)
-import Data.Vector.Generic ((!))
-import Math.NumberTheory.Mobius (mobiusVec, mobiusVec', mobiusChimera)
 import Data.Chimera qualified as Chimera
+import Data.Vector.Generic ((!))
+import Math.NumberTheory.Mobius
+  ( mertensChimera,
+    mobiusChimera,
+    mobiusVec,
+    mobiusVec',
+  )
 import SublinearSummation.Util (primes, word2Int)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase, (@?=))
@@ -20,7 +25,7 @@ tests =
       mobiusChimeraTests,
       mobiusVecTests,
       mobiusVec'Tests,
-      mertensTests
+      mertensChimeraTests
     ]
 
 isSquarefulNaive :: (Integral a) => a -> Bool
@@ -33,6 +38,7 @@ divides :: (Integral a) => a -> a -> Bool
 divides a b = (b `rem` a) == 0
 
 mobiusNaive :: (Integral a) => a -> a
+mobiusNaive 0 = 0
 mobiusNaive n =
   if isSquarefulNaive n
     then 0
@@ -55,7 +61,7 @@ mobiusTests = todoTest "mobius"
 mobiusVecTests :: TestTree
 mobiusVecTests =
   testCase "mobiusVec" $ do
-    forM_ [1 .. 30] $ \n ->
+    forM_ [0 .. 30] $ \n ->
       forM_ [n .. 30] $ \m ->
         let v = mobiusVec (fromIntegral n) (fromIntegral m)
          in forM_ [n .. m] $ \i ->
@@ -64,11 +70,20 @@ mobiusVecTests =
 mobiusVec'Tests :: TestTree
 mobiusVec'Tests =
   testCase "mobiusVec'" $ do
-    forM_ [1 .. 30] $ \n ->
+    forM_ [0 .. 30] $ \n ->
       forM_ [n .. 30] $ \m ->
         let v = mobiusVec' (fromIntegral n) (fromIntegral m)
          in forM_ [n .. m] $ \i ->
               assertEqual (show i) (v ! (i - n)) (mobiusNaive i)
 
-mertensTests :: TestTree
-mertensTests = todoTest "mertens"
+mertensNaive :: (Integral a) => a -> a
+mertensNaive n = sum (map mobiusNaive [1 .. n])
+
+mertensChimeraTests :: TestTree
+mertensChimeraTests =
+  testCase "mertensChimera" $ do
+    forM_ [0 .. 100] $ \i ->
+      assertEqual
+        ("i == " ++ show i)
+        (mertensNaive (word2Int i))
+        (Chimera.index mertensChimera i)

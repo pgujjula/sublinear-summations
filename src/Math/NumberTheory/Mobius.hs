@@ -23,17 +23,17 @@ module Math.NumberTheory.Mobius
   )
 where
 
-import Control.Monad (forM_)
+import Control.Monad (forM_, when)
 import Control.Monad.ST (runST)
-import Control.Placeholder (todo)
 import Data.Chimera (UChimera)
 import Data.Chimera qualified as Chimera
+import Data.List.Infinite qualified as Infinite
 import Data.Vector.Generic qualified as G
 import Data.Vector.Unboxed (Vector)
 import Data.Vector.Unboxed qualified as Vector
 import Data.Vector.Unboxed.Mutable qualified as MVector
 import Math.NumberTheory.Roots (integerSquareRoot)
-import SublinearSummation.Util (primes, primesVec, word2Int, fromVectors)
+import SublinearSummation.Util (fromVectors, primes, primesVec, word2Int)
 
 -- | Compute the mobius function.
 --  mobius 0 is arbitrarily defined as 0.
@@ -78,6 +78,8 @@ mobiusVec n m =
               | abs x == i -> signum x
               | otherwise -> -signum x
 
+        when (n' == 0) (MVector.write v 0 0)
+
         Vector.unsafeFreeze v
    in v'
 
@@ -118,6 +120,8 @@ mobiusVec' n m =
               | abs x == i -> signum x
               | otherwise -> -signum x
 
+        when (n' == 0) (MVector.write v 0 0)
+
         Vector.unsafeFreeze v
    in v'
 
@@ -126,8 +130,12 @@ mertens' :: Word -> Int
 mertens' = Chimera.index mertensChimera
 
 -- | Chimera of the Mertens function
+
+-- TODO: Use traverseSubvectors instead
 mertensChimera :: UChimera Int
-mertensChimera = todo
+mertensChimera =
+  Chimera.fromInfinite . Infinite.scanl1 (+) . Chimera.toInfinite $
+    mobiusChimera
 
 smallestMultipleGE :: (Integral a) => a -> a -> a
 smallestMultipleGE p n = p * (((n - 1) `quot` p) + 1)
