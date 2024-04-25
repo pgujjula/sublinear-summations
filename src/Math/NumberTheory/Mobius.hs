@@ -20,6 +20,7 @@ module Math.NumberTheory.Mobius
     -- * Mertens function
     mertens',
     mertensChimera,
+    mertensVec,
   )
 where
 
@@ -136,6 +137,45 @@ mertensChimera :: UChimera Int
 mertensChimera =
   Chimera.fromInfinite . Infinite.scanl1 (+) . Chimera.toInfinite $
     mobiusChimera
+
+mertensVec :: Word -> Word -> Vector Int
+mertensVec n m =
+  let sqrtm = integerSquareRoot m
+      ps = primesVec 0 sqrtm
+
+      m' :: Int
+      m' = word2Int m
+
+      v' = runST $ do
+        v <- MVector.replicate (word2Int (m + 1)) (1 :: Int)
+
+        G.forM_ ps $ \(word2Int -> p) -> do
+          let lower = smallestMultipleGE p 0
+          let upper = largestMultipleLE p (word2Int m)
+          forM_ [lower, lower + p .. upper] $ \i ->
+            MVector.unsafeModify v ((-p) *) i
+
+          let p2 = p * p
+          let lower' = smallestMultipleGE p2 0
+              upper' = largestMultipleLE p2 m'
+          forM_ [lower', lower' + p2 .. upper'] $ \i -> do
+            MVector.unsafeWrite v i 0
+
+        forM_ [0 .. m'] $ \i ->
+          flip (MVector.modify v) i $ \x ->
+            if
+              | x == 0 -> 0
+              | abs x == i -> signum x
+              | otherwise -> -signum x
+
+        MVector.write v 0 0
+
+        forM_ [1 .. m'] $ \i -> do
+          a <- MVector.read v (i - 1)
+          MVector.modify v (+ a) i
+
+        Vector.unsafeFreeze v
+   in Vector.drop (fromIntegral n) v'
 
 smallestMultipleGE :: (Integral a) => a -> a -> a
 smallestMultipleGE p n = p * (((n - 1) `quot` p) + 1)

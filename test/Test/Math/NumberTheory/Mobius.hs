@@ -6,8 +6,10 @@ module Test.Math.NumberTheory.Mobius (tests) where
 import Control.Monad (forM_)
 import Data.Chimera qualified as Chimera
 import Data.Vector.Generic ((!))
+import Data.Vector.Unboxed qualified as Vector
 import Math.NumberTheory.Mobius
   ( mertensChimera,
+    mertensVec,
     mobiusChimera,
     mobiusVec,
     mobiusVec',
@@ -25,7 +27,8 @@ tests =
       mobiusChimeraTests,
       mobiusVecTests,
       mobiusVec'Tests,
-      mertensChimeraTests
+      mertensChimeraTests,
+      mertensVecTests
     ]
 
 isSquarefulNaive :: (Integral a) => a -> Bool
@@ -87,3 +90,12 @@ mertensChimeraTests =
         ("i == " ++ show i)
         (mertensNaive (word2Int i))
         (Chimera.index mertensChimera i)
+
+mertensVecTests :: TestTree
+mertensVecTests =
+  testCase "mertensVec" $ do
+    forM_ [0 .. 30] $ \n ->
+      forM_ [n .. 30] $ \m ->
+        let v = mertensVec (fromIntegral n) (fromIntegral m)
+            vNaive = Vector.fromListN (m - n + 1) $ map mertensNaive [n .. m]
+         in assertEqual ("n == " ++ show n ++ ", m == " ++ show m) vNaive v
