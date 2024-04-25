@@ -23,6 +23,7 @@ tested-with:
 extra-doc-files:
     README.md
     ChangeLog.md
+    LICENSES/BSD-3-Clause.txt
 
 source-repository head
   type: git
