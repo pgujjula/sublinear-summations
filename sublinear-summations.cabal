@@ -76,6 +76,7 @@ test-suite sublinear-summations-tests
     , tasty
     , tasty-expected-failure
     , tasty-hunit
+    , vector
   default-language: GHC2021
 
 benchmark apply-merge-benchmarks
@@ -84,6 +85,7 @@ benchmark apply-merge-benchmarks
   other-modules:
       Bench.Math.NumberTheory.HyperbolicConvolution
       Bench.Math.NumberTheory.MemoHyper
+      Bench.Math.NumberTheory.Mobius
       Bench.Math.NumberTheory.Summation
       Bench.SublinearSummation.Util
       Bench.Util
@@ -99,4 +101,5 @@ benchmark apply-merge-benchmarks
     , tasty-bench
     , tasty-expected-failure
     , tasty-hunit
+    , vector
   default-language: GHC2021

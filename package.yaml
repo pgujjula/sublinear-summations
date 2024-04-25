@@ -57,6 +57,7 @@ tests:
     - tasty
     - tasty-expected-failure
     - tasty-hunit
+    - vector
 
 benchmarks:
   apply-merge-benchmarks:
@@ -68,3 +69,4 @@ benchmarks:
     - tasty-bench
     - tasty-expected-failure
     - tasty-hunit
+    - vector

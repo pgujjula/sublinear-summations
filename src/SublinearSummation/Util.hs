@@ -1,7 +1,14 @@
 -- SPDX-FileCopyrightText: Copyright Preetham Gujjula
 -- SPDX-License-Identifier: BSD-3-Clause
 
-module SublinearSummation.Util (word2Int, int2Word, primes, primesFrom) where
+module SublinearSummation.Util
+  ( word2Int,
+    int2Word,
+    primes,
+    primesFrom,
+    primesVec,
+  )
+where
 
 import Data.Vector.Storable (Vector)
 import Data.Vector.Storable qualified as Vector
