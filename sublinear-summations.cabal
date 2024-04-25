@@ -34,8 +34,11 @@ library
       Math.NumberTheory.HyperbolicConvolution
       Math.NumberTheory.MemoHyper
       Math.NumberTheory.Mobius
-  other-modules:
       SublinearSummation.Util
+  other-modules:
+      Paths_sublinear_summations
+  autogen-modules:
+      Paths_sublinear_summations
   hs-source-dirs:
       src
   ghc-options: -Wall -Wunused-packages
@@ -58,6 +61,7 @@ test-suite sublinear-summations-tests
       Test.Math.NumberTheory.MemoHyper
       Test.Math.NumberTheory.Mobius
       Test.Math.NumberTheory.Summation
+      Test.SublinearSummation.Util
       Test.Util
       Paths_sublinear_summations
   autogen-modules:

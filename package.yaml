@@ -36,7 +36,6 @@ library:
   - Math.NumberTheory.HyperbolicConvolution
   - Math.NumberTheory.MemoHyper
   - Math.NumberTheory.Mobius
-  other-modules:
   - SublinearSummation.Util
   dependencies:
   - apply-merge
