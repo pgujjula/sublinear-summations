@@ -15,6 +15,7 @@ module Math.NumberTheory.Mobius
     mobius',
     mobiusChimera,
     mobiusVec,
+    mobiusVec',
 
     -- * Mertens function
     mertens',
@@ -32,7 +33,7 @@ import Data.Vector.Unboxed (Vector)
 import Data.Vector.Unboxed qualified as Vector
 import Data.Vector.Unboxed.Mutable qualified as MVector
 import Math.NumberTheory.Roots (integerSquareRoot)
-import SublinearSummation.Util (primesVec, word2Int)
+import SublinearSummation.Util (primes, primesVec, word2Int)
 
 -- | Compute the mobius function.
 --  mobius 0 is arbitrarily defined as 0.
@@ -44,6 +45,7 @@ mobius' = Chimera.index mobiusChimera
 mobiusChimera :: UChimera Int
 mobiusChimera = todo
 
+-- | Generate the mobius function between the two inputs, inclusive.
 mobiusVec :: Word -> Word -> Vector Int
 mobiusVec n m =
   let sqrtm = integerSquareRoot m
@@ -58,6 +60,46 @@ mobiusVec n m =
         v <- MVector.replicate (word2Int (m - n + 1)) (1 :: Int)
 
         G.forM_ ps $ \(word2Int -> p) -> do
+          let lower = smallestMultipleGE p (word2Int n)
+          let upper = largestMultipleLE p (word2Int m)
+          forM_ [lower, lower + p .. upper] $ \i ->
+            MVector.unsafeModify v ((-p) *) (i - n')
+
+          let p2 = p * p
+          let lower' = smallestMultipleGE p2 n'
+              upper' = largestMultipleLE p2 m'
+          forM_ [lower', lower' + p2 .. upper'] $ \i -> do
+            MVector.unsafeWrite v (i - n') 0
+
+        forM_ [n' .. m'] $ \i ->
+          flip (MVector.modify v) (i - n') $ \x ->
+            if
+              | x == 0 -> 0
+              | abs x == i -> signum x
+              | otherwise -> -signum x
+
+        Vector.unsafeFreeze v
+   in v'
+
+-- | Like 'mobiusVec', but uses sharing.
+mobiusVec' :: Word -> Word -> Vector Int
+mobiusVec' n m =
+  let m' :: Int
+      m' = word2Int m
+
+      n' :: Int
+      n' = word2Int n
+
+      sqrtm :: Word
+      sqrtm = integerSquareRoot m
+
+      ps :: [Word]
+      ps = takeWhile (<= sqrtm) primes
+
+      v' = runST $ do
+        v <- MVector.replicate (word2Int (m - n + 1)) (1 :: Int)
+
+        forM_ ps $ \(word2Int -> p) -> do
           let lower = smallestMultipleGE p (word2Int n)
           let upper = largestMultipleLE p (word2Int m)
           forM_ [lower, lower + p .. upper] $ \i ->

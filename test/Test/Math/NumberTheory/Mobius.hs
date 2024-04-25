@@ -5,7 +5,7 @@ module Test.Math.NumberTheory.Mobius (tests) where
 
 import Control.Monad (forM_)
 import Data.Vector.Generic ((!))
-import Math.NumberTheory.Mobius (mobiusVec)
+import Math.NumberTheory.Mobius (mobiusVec, mobiusVec')
 import SublinearSummation.Util (primes)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase)
@@ -17,6 +17,7 @@ tests =
     "Math.NumberTheory.Mobius"
     [ mobiusTests,
       mobiusVecTests,
+      mobiusVec'Tests,
       mertensTests
     ]
 
@@ -49,6 +50,15 @@ mobiusVecTests =
     forM_ [1 .. 30] $ \n ->
       forM_ [n .. 30] $ \m ->
         let v = mobiusVec (fromIntegral n) (fromIntegral m)
+         in forM_ [n .. m] $ \i ->
+              assertEqual (show i) (v ! (i - n)) (mobiusNaive i)
+
+mobiusVec'Tests :: TestTree
+mobiusVec'Tests =
+  testCase "mobiusVec'" $ do
+    forM_ [1 .. 30] $ \n ->
+      forM_ [n .. 30] $ \m ->
+        let v = mobiusVec' (fromIntegral n) (fromIntegral m)
          in forM_ [n .. m] $ \i ->
               assertEqual (show i) (v ! (i - n)) (mobiusNaive i)
 
