@@ -31,7 +31,7 @@ module Math.NumberTheory.HyperbolicConvolution
   )
 where
 
-import Control.Placeholder (todo)
+import Math.NumberTheory.Mobius (mertens', mobius')
 import Math.NumberTheory.Roots (integerSquareRoot)
 
 -- | @'hyper' n f k = f (n \`'quot'\` k)@
@@ -112,7 +112,13 @@ hyperConvolveMobiusFast ::
   (Word -> b) ->
   Word ->
   b
-hyperConvolveMobiusFast = todo
+hyperConvolveMobiusFast diff_f hyper_f n =
+  hyperConvolveFast
+    (fromIntegral . mobius')
+    (fromIntegral . hyper n mertens')
+    diff_f
+    hyper_f
+    n
 {-# INLINE hyperConvolveMobiusFast #-}
 
 -- hyperConvolveFastM ::

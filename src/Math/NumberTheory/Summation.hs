@@ -27,8 +27,13 @@ import Control.Placeholder (todo)
 import Data.Bits (shiftR)
 import Data.List.ApplyMerge (applyMerge)
 import Data.List.Ordered (minus)
-import Math.NumberTheory.HyperbolicConvolution (diff, hyper, hyperConvolveFast)
-import Math.NumberTheory.Mobius (mertens', mobius')
+import Math.NumberTheory.HyperbolicConvolution
+  ( diff,
+    hyper,
+    hyperConvolveFast,
+    hyperConvolveMobiusFast,
+  )
+import Math.NumberTheory.Mobius (mobius')
 import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (word2Int)
 
@@ -79,9 +84,7 @@ sumTotient n =
 
       s =
         fromIntegral $
-          hyperConvolveFast
-            mobius'
-            (hyper n' mertens')
+          hyperConvolveMobiusFast
             (diff square)
             (hyper n' square)
             n'
