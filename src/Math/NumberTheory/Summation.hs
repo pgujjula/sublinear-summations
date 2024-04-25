@@ -25,12 +25,10 @@ where
 
 import Control.Placeholder (todo)
 import Data.Bits (shiftR)
-import Data.Chimera (UChimera)
-import Data.Chimera qualified as Chimera
-import Data.Function ((&))
 import Data.List.ApplyMerge (applyMerge)
 import Data.List.Ordered (minus)
 import Math.NumberTheory.HyperbolicConvolution (diff, hyper, hyperConvolveFast)
+import Math.NumberTheory.Mobius (mertens', mobius')
 import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (word2Int)
 
@@ -89,55 +87,6 @@ sumTotient n =
             n'
    in (s + 1) `quot` 2
 {-# INLINE sumTotient #-}
-
-mobius' :: Word -> Int
-mobius' n = Chimera.index mobiusChimera (n - 1)
-{-# INLINE mobius' #-}
-
-mertens' :: Word -> Int
-mertens' n = Chimera.index mertensChimera (n - 1)
-{-# INLINE mertens' #-}
-
-mobiusChimera :: UChimera Int
-mobiusChimera = Chimera.fromListWithDef 0 mobiuses
-
-mertensChimera :: UChimera Int
-mertensChimera = Chimera.fromListWithDef 0 mertenses
-
-mobiuses :: [Int]
-mobiuses =
-  let primes :: [Word]
-      primes = 2 : ([3 ..] `minus` composites)
-
-      composites :: [Word]
-      composites = applyMerge (\p i -> p * (p + i)) primes [0 ..]
-
-      isSquarefrees :: [Int]
-      isSquarefrees = go 1 squarefrees
-        where
-          go :: Word -> [Word] -> [Int]
-          go x (y : ys) =
-            if x == y
-              then 1 : go (x + 1) ys
-              else 0 : go (x + 1) (y : ys)
-          go _ _ = error "impossible"
-
-      countUp :: [Word] -> [(Word, Int)]
-      countUp = go 1 0
-        where
-          go :: Word -> Int -> [Word] -> [(Word, Int)]
-          go x !i (y : ys) =
-            if x == y
-              then go x (i + 1) ys
-              else (x, i) : go (x + 1) 0 (y : ys)
-          go _ _ _ = error "impossible"
-   in applyMerge (*) primes [1 ..]
-        & countUp
-        & map (\(_, n) -> if even n then 1 else -1)
-        & zipWith (*) isSquarefrees
-
-mertenses :: [Int]
-mertenses = scanl1 (+) mobiuses
 
 --
 -- Primes
