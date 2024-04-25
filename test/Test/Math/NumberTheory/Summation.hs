@@ -103,8 +103,8 @@ mertensTests = todoTest "mertens"
 
 isSquarefreeNaive :: (Integral a) => a -> Bool
 isSquarefreeNaive n =
-  let squares = map (^ (2 :: Int)) [1 ..]
-   in not (any (`divides` n) (takeWhile (<= n) (tail squares)))
+  let nonOneSquares = map (^ (2 :: Int)) [2 ..]
+   in not (any (`divides` n) (takeWhile (<= n) nonOneSquares))
 
 numSquarefreeNaive :: (Integral a) => a -> a
 numSquarefreeNaive n = genericLength (filter isSquarefreeNaive [1 .. n])

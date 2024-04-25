@@ -159,11 +159,11 @@ primeSum = todo
 mertens :: (Integral a) => a -> a
 mertens = todo
 
-squares :: [Word]
-squares = map (^ (2 :: Int)) [1 ..]
+nonOneSquares :: [Word]
+nonOneSquares = map (^ (2 :: Int)) [2 ..]
 
 squarefrees :: [Word]
-squarefrees = [1 ..] `minus` applyMerge (*) (tail squares) [1 ..]
+squarefrees = [1 ..] `minus` applyMerge (*) nonOneSquares [1 ..]
 
 -- | The number of square-free integers ≤ @n@.
 numSquarefree :: (Integral a) => a -> a

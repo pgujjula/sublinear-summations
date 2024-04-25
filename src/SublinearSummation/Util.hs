@@ -10,6 +10,9 @@ module SublinearSummation.Util
   )
 where
 
+import Data.Function ((&))
+import Data.List.Infinite (Infinite ((:<)))
+import Data.List.Infinite qualified as Infinite
 import Data.Vector.Storable (Vector)
 import Data.Vector.Storable qualified as Vector
 import Data.Word (Word64)
@@ -30,12 +33,14 @@ primes = primesFrom 0
 
 primesFrom :: Word -> [Word]
 primesFrom i =
-  let starts :: [Word]
-      starts = map (+ i) (0 : iterate (* 2) 1)
+  let starts :: Infinite Word
+      starts = Infinite.map (+ i) (0 :< Infinite.iterate (* 2) 1)
 
-      ends :: [Word]
-      ends = map (\x -> x - 1) (tail starts)
-   in concatMap Vector.toList (zipWith primesVec starts ends)
+      ends :: Infinite Word
+      ends = Infinite.map (\x -> x - 1) (Infinite.tail starts)
+   in Infinite.zipWith primesVec starts ends
+        & Infinite.toList
+        & concatMap Vector.toList
 
 primesVec :: Word -> Word -> Vector Word
 primesVec n m =

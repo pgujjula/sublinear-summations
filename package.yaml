@@ -42,6 +42,7 @@ library:
   - apply-merge
   - chimera
   - data-ordlist
+  - infinite-list
   - integer-roots
   - placeholder
   - primesieve
