@@ -5,10 +5,11 @@ module Test.Math.NumberTheory.Mobius (tests) where
 
 import Control.Monad (forM_)
 import Data.Vector.Generic ((!))
-import Math.NumberTheory.Mobius (mobiusVec, mobiusVec')
-import SublinearSummation.Util (primes)
+import Math.NumberTheory.Mobius (mobiusVec, mobiusVec', mobiusChimera)
+import Data.Chimera qualified as Chimera
+import SublinearSummation.Util (primes, word2Int)
 import Test.Tasty (TestTree, testGroup)
-import Test.Tasty.HUnit (assertEqual, testCase)
+import Test.Tasty.HUnit (assertEqual, testCase, (@?=))
 import Test.Util (todoTest)
 
 tests :: TestTree
@@ -16,6 +17,7 @@ tests =
   testGroup
     "Math.NumberTheory.Mobius"
     [ mobiusTests,
+      mobiusChimeraTests,
       mobiusVecTests,
       mobiusVec'Tests,
       mertensTests
@@ -40,6 +42,12 @@ mobiusNaive n =
        in if even (length primeDivisors)
             then 1
             else -1
+
+mobiusChimeraTests :: TestTree
+mobiusChimeraTests =
+  testCase "mobiusChimera" $ do
+    forM_ [1 .. 100] $ \i ->
+      Chimera.index mobiusChimera i @?= mobiusNaive (word2Int i)
 
 mobiusTests :: TestTree
 mobiusTests = todoTest "mobius"

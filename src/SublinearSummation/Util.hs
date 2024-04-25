@@ -7,12 +7,16 @@ module SublinearSummation.Util
     primes,
     primesFrom,
     primesVec,
+    fromVectors,
   )
 where
 
+import Data.Chimera (Chimera, UChimera)
+import Data.Chimera qualified as Chimera
 import Data.Function ((&))
 import Data.List.Infinite (Infinite ((:<)))
 import Data.List.Infinite qualified as Infinite
+import Data.Vector.Generic qualified as G
 import Data.Vector.Storable (Vector)
 import Data.Vector.Storable qualified as Vector
 import Data.Word (Word64)
@@ -47,3 +51,12 @@ primesVec n m =
   let v :: Vector Word64
       v = unsafePerformIO $ generatePrimes (fromIntegral n) (fromIntegral m)
    in unsafeCoerce v
+
+unitChimera :: UChimera ()
+unitChimera = Chimera.tabulate (const ())
+
+fromVectors :: (G.Vector v a) => (Word -> Word -> v a) -> Chimera v a
+fromVectors f = flip Chimera.imapSubvectors unitChimera $ \i v ->
+  let l :: Word
+      l = int2Word (G.length v)
+   in f i (i + l - 1)

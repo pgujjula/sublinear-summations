@@ -33,7 +33,7 @@ import Data.Vector.Unboxed (Vector)
 import Data.Vector.Unboxed qualified as Vector
 import Data.Vector.Unboxed.Mutable qualified as MVector
 import Math.NumberTheory.Roots (integerSquareRoot)
-import SublinearSummation.Util (primes, primesVec, word2Int)
+import SublinearSummation.Util (primes, primesVec, word2Int, fromVectors)
 
 -- | Compute the mobius function.
 --  mobius 0 is arbitrarily defined as 0.
@@ -43,7 +43,7 @@ mobius' = Chimera.index mobiusChimera
 
 -- | Chimera of the mobius function
 mobiusChimera :: UChimera Int
-mobiusChimera = todo
+mobiusChimera = fromVectors mobiusVec'
 
 -- | Generate the mobius function between the two inputs, inclusive.
 mobiusVec :: Word -> Word -> Vector Int

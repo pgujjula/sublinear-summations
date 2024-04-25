@@ -54,6 +54,7 @@ tests:
     - test
     main: Main.hs
     dependencies:
+    - chimera
     - integer-roots
     - sublinear-summations
     - tasty
