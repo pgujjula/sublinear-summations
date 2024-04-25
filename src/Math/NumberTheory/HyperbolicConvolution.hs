@@ -24,6 +24,12 @@ module Math.NumberTheory.HyperbolicConvolution
     diff,
     mul,
 
+    -- ** Monadic combinators
+    hyperM,
+    sigmaM,
+    diffM,
+    mulM,
+
     -- * Computing hyperbolic convolutions
     hyperConvolve,
     hyperConvolveFast,
@@ -52,17 +58,33 @@ diff f n =
     else f n - f (n - 1)
 {-# INLINE diff #-}
 
--- diffM :: (Num b, Monad m) => (Word -> m b) -> (Word -> m b)
--- diffM f n =
---  if n == 1
---    then f 1
---    else liftA2 (-) (f n) (f (n - 1))
--- {-# INLINE diffM #-}
-
 -- | @'mul' f g n = f n * g n@
 mul :: (Num b) => (Word -> b) -> (Word -> b) -> (Word -> b)
 mul = liftA2 (*)
 {-# INLINE mul #-}
+
+-- | Lifted 'hyper'.
+hyperM :: (Monad m) => Word -> (Word -> m b) -> (Word -> m b)
+hyperM n f k = f (n `quot` k)
+{-# INLINE hyperM #-}
+
+-- | Lifted 'sigma'
+sigmaM :: (Monad m, Num b) => (Word -> m b) -> (Word -> m b)
+sigmaM f n = sum <$> mapM f [1 .. n]
+{-# INLINE sigmaM #-}
+
+-- | Lifted 'diff'.
+diffM :: (Monad m, Num b) => (Word -> m b) -> (Word -> m b)
+diffM f n =
+  if n == 1
+    then f 1
+    else liftA2 (-) (f n) (f (n - 1))
+{-# INLINE diffM #-}
+
+-- | Lifted 'mul'.
+mulM :: (Monad m, Num b) => (Word -> m b) -> (Word -> m b) -> (Word -> m b)
+mulM = liftA2 (liftA2 (*))
+{-# INLINE mulM #-}
 
 -- | Given two functions \(f, g : \mathbb{N}^{+} \to \mathbf{B}\), produce the
 -- hyperbolic convolution \(f \ast_{h} g\).
