@@ -85,6 +85,7 @@ benchmark apply-merge-benchmarks
       Bench.Math.NumberTheory.HyperbolicConvolution
       Bench.Math.NumberTheory.MemoHyper
       Bench.Math.NumberTheory.Summation
+      Bench.SublinearSummation.Util
       Bench.Util
       Paths_sublinear_summations
   autogen-modules:
