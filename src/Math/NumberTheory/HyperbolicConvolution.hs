@@ -31,7 +31,6 @@ module Math.NumberTheory.HyperbolicConvolution
   )
 where
 
-import Control.Applicative (liftA2)
 import Control.Placeholder (todo)
 import Math.NumberTheory.Roots (integerSquareRoot)
 
