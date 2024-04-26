@@ -34,6 +34,7 @@ library
       Math.NumberTheory.Summation
       Math.NumberTheory.HyperbolicConvolution
       Math.NumberTheory.MemoHyper
+      Math.NumberTheory.MemoHyper.Internal
       Math.NumberTheory.MemoHyper.Mutable
       Math.NumberTheory.Mobius
       SublinearSummation.Util
@@ -63,6 +64,7 @@ test-suite sublinear-summations-tests
   other-modules:
       Test.Math.NumberTheory.HyperbolicConvolution
       Test.Math.NumberTheory.MemoHyper
+      Test.Math.NumberTheory.MemoHyper.Internal
       Test.Math.NumberTheory.Mobius
       Test.Math.NumberTheory.Summation
       Test.SublinearSummation.Util
