@@ -5,7 +5,8 @@ module Bench.Math.NumberTheory.Summation (benchmarks) where
 
 import Bench.Util (todoBenchmark)
 import Math.NumberTheory.Summation
-  ( numSquarefree,
+  ( mertens,
+    numSquarefree,
     sumNumDivisors,
     sumSquarefree,
     sumSumDivisors,
@@ -73,7 +74,10 @@ primeSumBenchmarks = todoBenchmark "primeSum"
 --
 
 mertensBenchmarks :: Benchmark
-mertensBenchmarks = todoBenchmark "mertens"
+mertensBenchmarks =
+  bgroup "mertens" $ flip map [(1 :: Int) .. 8] $ \i ->
+    bench ("10^" ++ show i) $
+      nf mertens (10 ^ i :: Int)
 
 numSquarefreeBenchmarks :: Benchmark
 numSquarefreeBenchmarks =

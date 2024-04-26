@@ -31,6 +31,11 @@ import Math.NumberTheory.HyperbolicConvolution
     hyperConvolveFast,
     hyperConvolveMobiusFast,
   )
+import Math.NumberTheory.MemoHyper
+  ( UMemoHyper,
+    memoHyperMertens,
+    unMemoHyper,
+  )
 import Math.NumberTheory.Summation.Internal
 import SublinearSummation.Util (word2Int)
 
@@ -106,4 +111,10 @@ primeSum = todo
 
 -- | The Mertens function.
 mertens :: (Integral a) => a -> a
-mertens = todo
+mertens n =
+  if n <= 0
+    then 0
+    else
+      fromIntegral
+        . flip unMemoHyper 1
+        $ (memoHyperMertens (fromIntegral n) :: UMemoHyper Int)

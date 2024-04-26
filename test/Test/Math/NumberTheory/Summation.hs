@@ -6,12 +6,14 @@ module Test.Math.NumberTheory.Summation (tests) where
 import Control.Monad (forM_)
 import Data.List (genericLength)
 import Math.NumberTheory.Summation
-  ( numSquarefree,
+  ( mertens,
+    numSquarefree,
     sumNumDivisors,
     sumSquarefree,
     sumSumDivisors,
     sumTotient,
   )
+import SublinearSummation.Util (primes)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase)
 import Test.Util (todoTest)
@@ -99,7 +101,31 @@ primeSumTests = todoTest "primeSum"
 --
 
 mertensTests :: TestTree
-mertensTests = todoTest "mertens"
+mertensTests =
+  testCase "mertens" $ do
+    forM_ [(-10 :: Int) .. 100] $ \n ->
+      assertEqual (show n) (mertens n) (mertensNaive n)
+
+isSquarefulNaive :: (Integral a) => a -> Bool
+isSquarefulNaive n = any (`divides` n) (takeWhile (<= n) squares)
+
+squares :: (Integral a) => [a]
+squares = map (^ (2 :: Int)) [2 ..]
+
+mobiusNaive :: (Integral a) => a -> a
+mobiusNaive 0 = 0
+mobiusNaive n =
+  if isSquarefulNaive n
+    then 0
+    else
+      let ps = takeWhile (<= n) (map fromIntegral primes)
+          primeDivisors = filter (`divides` n) ps
+       in if even (length primeDivisors)
+            then 1
+            else -1
+
+mertensNaive :: (Integral a) => a -> a
+mertensNaive n = sum (map mobiusNaive [1 .. n])
 
 isSquarefreeNaive :: (Integral a) => a -> Bool
 isSquarefreeNaive n =
