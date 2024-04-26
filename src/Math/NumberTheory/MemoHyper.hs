@@ -63,10 +63,12 @@ import Data.Vector.Generic qualified as G
 import Data.Vector.Generic.Mutable (PrimMonad, PrimState)
 import Data.Vector.Unboxed qualified as U
 import Math.NumberTheory.HyperbolicConvolution
+import Math.NumberTheory.MemoHyper.Internal (numSquarefreeVec, sumSquarefreeVec)
 import Math.NumberTheory.MemoHyper.Mutable (MMemoHyper (..))
 import Math.NumberTheory.MemoHyper.Mutable qualified as MMemoHyper
 import Math.NumberTheory.Mobius (mertensVec, mobius')
 import Math.NumberTheory.Roots (integerRoot, integerSquareRoot)
+import Math.NumberTheory.Summation (numSquarefree, sumSquarefree)
 import SublinearSummation.Util (word2Int)
 
 -- | @'MemoHyper' v n b@ memoizes a function of the form
@@ -277,11 +279,39 @@ memoHyperSumTotient = todo
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.numSquarefree'.
 memoHyperNumSquarefree :: (Integral a, G.Vector v a) => Word -> MemoHyper v a
-memoHyperNumSquarefree = todo
+memoHyperNumSquarefree n =
+  let n23 :: Word
+      n23 = pow23 n
+
+      nvec :: U.Vector Int
+      nvec = numSquarefreeVec 0 n23
+
+      nsfree :: Word -> Int
+      nsfree t = nvec ! word2Int t
+   in memoHyperFixST n $ \_ i ->
+        let nqi = n `quot` i
+         in pure $
+              if nqi <= n23
+                then fromIntegral (nsfree nqi)
+                else fromIntegral (numSquarefree nqi)
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumSquarefree'.
 memoHyperSumSquarefree :: (Integral a, G.Vector v a) => Word -> MemoHyper v a
-memoHyperSumSquarefree = todo
+memoHyperSumSquarefree n =
+  let n23 :: Word
+      n23 = pow23 n
+
+      svec :: U.Vector Int
+      svec = sumSquarefreeVec 0 n23
+
+      ssfree :: Word -> Int
+      ssfree t = svec ! word2Int t
+   in memoHyperFixST n $ \_ i ->
+        let nqi = n `quot` i
+         in pure $
+              if nqi <= n23
+                then fromIntegral (ssfree nqi)
+                else fromIntegral (sumSquarefree nqi)
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.primePi'.
 memoHyperPrimePi :: (G.Vector v a, Integral a) => Word -> MemoHyper v a
