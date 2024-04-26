@@ -60,6 +60,7 @@ tests:
     dependencies:
     - chimera
     - integer-roots
+    - primecount
     - sublinear-summations
     - tasty
     - tasty-expected-failure

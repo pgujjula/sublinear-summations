@@ -80,6 +80,7 @@ test-suite sublinear-summations-tests
       base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
     , chimera
     , integer-roots
+    , primecount
     , sublinear-summations
     , tasty
     , tasty-expected-failure

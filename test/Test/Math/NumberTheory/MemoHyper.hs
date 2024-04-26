@@ -11,13 +11,15 @@ import Math.NumberTheory.MemoHyper
     UMemoHyper,
     memoHyperMertens,
     memoHyperNumSquarefree,
+    memoHyperPrimePi,
     memoHyperSumSquarefree,
   )
+import Math.NumberTheory.Prime.Count (primePi)
 import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (primes)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
-import Test.Util (todoTest)
+import Test.Util (todoCode, todoTest)
 
 tests :: TestTree
 tests =
@@ -101,7 +103,25 @@ memoHyperSumTotientTests = todoTest "memoHyperSumTotient"
 -- Primes
 
 memoHyperPrimePiTests :: TestTree
-memoHyperPrimePiTests = todoTest "memoHyperPrimePi"
+memoHyperPrimePiTests =
+  todoCode . testCase "memoHyperPrimePi" $
+    forM_ [1 .. 100] $ \n ->
+      let mh :: UMemoHyper Word
+          mh = memoHyperPrimePi n
+          mhNaive :: UMemoHyper Word
+          mhNaive =
+            let sq = integerSquareRoot n
+             in MemoHyper
+                  { mhLimit = n,
+                    mhSqrtLimit = integerSquareRoot n,
+                    mhFuncVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map (primePi . fromIntegral) [1 .. sq],
+                    mhHyperVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map (primePi . fromIntegral . (n `quot`)) [1 .. sq]
+                  }
+       in mh @?= mhNaive
 
 memoHyperPrimeSumTests :: TestTree
 memoHyperPrimeSumTests = todoTest "memoHyperPrimeSum"
