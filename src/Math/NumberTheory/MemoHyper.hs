@@ -33,6 +33,9 @@ module Math.NumberTheory.MemoHyper
     freeze,
     unsafeFreeze,
 
+    -- * Memoization
+    memoHyperFixST,
+
     -- * @'MemoHyper'@ for arithmetic functions
 
     -- ** Divisor functions
@@ -196,6 +199,28 @@ unsafeFreeze mmh = do
             mhHyperVec = hyperVec
           }
   pure mh
+
+-- | Take @n@ and a recursive function @rec@. @rec@ takes a function @fh@ and an
+-- input @i@, where @fh j = f (n `quot` j)@ and returns @f (n `quot` i)@.
+memoHyperFixST ::
+  (G.Vector v a, Integral a) =>
+  Word ->
+  (forall s. (Word -> ST s a) -> Word -> ST s a) ->
+  MemoHyper v a
+memoHyperFixST n rec = runST $ do
+  mmh <- MMemoHyper.new n
+  let sq = integerSquareRoot n
+      fh = MMemoHyper.readHyper mmh
+
+  forM_ [(1 :: Word) .. sq] $ \i -> do
+    x <- rec fh (n `quot` i)
+    MMemoHyper.writeSmall mmh i x
+
+  forM_ [sq, sq - 1 .. (1 :: Word)] $ \i -> do
+    x <- rec fh i
+    MMemoHyper.writeHyper mmh i x
+
+  freeze mmh
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.mertens'.
 memoHyperMertens :: (G.Vector v a, Integral a) => Word -> MemoHyper v a
