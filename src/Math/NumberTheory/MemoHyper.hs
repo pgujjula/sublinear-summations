@@ -17,7 +17,7 @@
 -- Maintainer: Preetham Gujjula <libraries@mail.preetham.io>
 -- Stability: experimental
 module Math.NumberTheory.MemoHyper
-  ( MemoHyper,
+  ( MemoHyper (..),
     UMemoHyper,
     VMemoHyper,
     unMemoHyper,
@@ -54,14 +54,19 @@ module Math.NumberTheory.MemoHyper
   )
 where
 
+import Control.Monad (forM_)
+import Control.Monad.ST (ST, runST)
 import Control.Placeholder (todo)
 import Data.Vector qualified as V
 import Data.Vector.Generic (Mutable, (!))
 import Data.Vector.Generic qualified as G
 import Data.Vector.Generic.Mutable (PrimMonad, PrimState)
 import Data.Vector.Unboxed qualified as U
+import Math.NumberTheory.HyperbolicConvolution
 import Math.NumberTheory.MemoHyper.Mutable (MMemoHyper (..))
-import Math.NumberTheory.Roots (integerSquareRoot)
+import Math.NumberTheory.MemoHyper.Mutable qualified as MMemoHyper
+import Math.NumberTheory.Mobius (mertensVec, mobius')
+import Math.NumberTheory.Roots (integerRoot, integerSquareRoot)
 import SublinearSummation.Util (word2Int)
 
 -- | @'MemoHyper' v n b@ memoizes a function of the form
@@ -222,9 +227,41 @@ memoHyperFixST n rec = runST $ do
 
   freeze mmh
 
+pow23 :: (Integral a) => a -> a
+pow23 x =
+  let x' :: Integer
+      x' = toInteger x
+
+      y' :: Integer
+      y' = integerRoot (3 :: Int) (x' * x')
+   in fromIntegral y'
+
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.mertens'.
 memoHyperMertens :: (G.Vector v a, Integral a) => Word -> MemoHyper v a
-memoHyperMertens = todo
+memoHyperMertens n =
+  let n23 :: Word
+      n23 = pow23 n
+
+      mvec :: U.Vector Int
+      mvec = mertensVec 0 n23
+
+      mert :: Word -> Int
+      mert t = mvec ! word2Int t
+   in memoHyperFixST n $ \fh i ->
+        if n `quot` i <= n23
+          then pure (fromIntegral (mert (n `quot` i)))
+          else do
+            let g 1 = pure 0
+                g j = fh (i * j)
+                nqi = n `quot` i
+            s <-
+              hyperConvolveFastM
+                (const (pure 1))
+                (pure . fromIntegral . (nqi `quot`))
+                (pure . fromIntegral . mobius')
+                g
+                nqi
+            pure (1 - s)
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumNumDivisors'.
 memoHyperSumNumDivisors :: (Integral a, G.Vector v a) => Word -> MemoHyper v a

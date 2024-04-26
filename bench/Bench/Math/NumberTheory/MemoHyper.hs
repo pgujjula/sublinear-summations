@@ -4,7 +4,8 @@
 module Bench.Math.NumberTheory.MemoHyper (benchmarks) where
 
 import Bench.Util (todoBenchmark)
-import Test.Tasty.Bench (Benchmark, bgroup)
+import Math.NumberTheory.MemoHyper (UMemoHyper, memoHyperMertens, unMemoHyper)
+import Test.Tasty.Bench (Benchmark, bench, bgroup, nf)
 
 benchmarks :: Benchmark
 benchmarks =
@@ -96,7 +97,12 @@ memoHyperPrimeSumBenchmarks = todoBenchmark "memoHyperPrimeSum"
 -- Square-free integers
 
 memoHyperMertensBenchmarks :: Benchmark
-memoHyperMertensBenchmarks = todoBenchmark "memoHyperMertens"
+memoHyperMertensBenchmarks =
+  bgroup "memoHyperMertens" $ flip map [(1 :: Int) .. 8] $ \i ->
+    bench ("10^" ++ show i) $
+      nf
+        (flip unMemoHyper 1 . (memoHyperMertens :: Word -> UMemoHyper Int))
+        (10 ^ i)
 
 memoHyperNumSquarefreeBenchmarks :: Benchmark
 memoHyperNumSquarefreeBenchmarks = todoBenchmark "memoHyperNumSquarefree"

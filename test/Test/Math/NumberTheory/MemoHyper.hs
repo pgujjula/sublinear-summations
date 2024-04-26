@@ -4,11 +4,13 @@
 module Test.Math.NumberTheory.MemoHyper (tests) where
 
 import Control.Monad (forM_)
-import Math.NumberTheory.MemoHyper (UMemoHyper, memoHyperMertens, unMemoHyper)
+import Data.Vector.Generic qualified as Vector
+import Math.NumberTheory.MemoHyper (MemoHyper (..), UMemoHyper, memoHyperMertens)
+import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (primes)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
-import Test.Util (todoCode, todoTest)
+import Test.Util (todoTest)
 
 tests :: TestTree
 tests =
@@ -101,13 +103,25 @@ memoHyperPrimeSumTests = todoTest "memoHyperPrimeSum"
 
 memoHyperMertensTests :: TestTree
 memoHyperMertensTests =
-  todoCode $
-    testCase "memoHyperMertens" $
-      forM_ [1 .. 100] $ \n ->
-        let mh :: UMemoHyper Int
-            mh = memoHyperMertens n
-         in forM_ [1 .. n] $ \i ->
-              unMemoHyper mh i @?= mertensNaive (fromIntegral (n `quot` i))
+  testCase "memoHyperMertens" $
+    forM_ [1 .. 100] $ \n ->
+      let mh :: UMemoHyper Int
+          mh = memoHyperMertens n
+
+          mhNaive :: UMemoHyper Int
+          mhNaive =
+            let sq = integerSquareRoot n
+             in MemoHyper
+                  { mhLimit = n,
+                    mhSqrtLimit = integerSquareRoot n,
+                    mhFuncVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map (mertensNaive . fromIntegral) [1 .. sq],
+                    mhHyperVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map (mertensNaive . fromIntegral . (n `quot`)) [1 .. sq]
+                  }
+       in mh @?= mhNaive
 
 memoHyperNumSquarefreeTests :: TestTree
 memoHyperNumSquarefreeTests = todoTest "memoHyperNumSquarefree"
