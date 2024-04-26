@@ -9,7 +9,6 @@ import Data.Vector.Generic ((!))
 import Math.NumberTheory.MemoHyper.Internal (numSquarefreeVec, sumSquarefreeVec)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase)
-import Test.Util (todoCode)
 
 tests :: TestTree
 tests =
@@ -21,23 +20,21 @@ tests =
 
 numSquarefreeVecTests :: TestTree
 numSquarefreeVecTests =
-  todoCode $
-    testCase "numSquarefreeVec" $ do
-      forM_ [0 .. 30] $ \n ->
-        forM_ [n .. 30] $ \m ->
-          let v = numSquarefreeVec (fromIntegral n) (fromIntegral m)
-           in forM_ [n .. m] $ \i ->
-                assertEqual (show i) (v ! (i - n)) (numSquarefreeNaive i)
+  testCase "numSquarefreeVec" $ do
+    forM_ [0 .. 30] $ \n ->
+      forM_ [n .. 30] $ \m ->
+        let v = numSquarefreeVec (fromIntegral n) (fromIntegral m)
+         in forM_ [n .. m] $ \i ->
+              assertEqual (show i) (v ! (i - n)) (numSquarefreeNaive i)
 
 sumSquarefreeVecTests :: TestTree
 sumSquarefreeVecTests =
-  todoCode $
-    testCase "sumSquarefreeVec" $ do
-      forM_ [0 .. 30] $ \n ->
-        forM_ [n .. 30] $ \m ->
-          let v = sumSquarefreeVec (fromIntegral n) (fromIntegral m)
-           in forM_ [n .. m] $ \i ->
-                assertEqual (show i) (v ! (i - n)) (sumSquarefreeNaive i)
+  testCase "sumSquarefreeVec" $ do
+    forM_ [0 .. 30] $ \n ->
+      forM_ [n .. 30] $ \m ->
+        let v = sumSquarefreeVec (fromIntegral n) (fromIntegral m)
+         in forM_ [n .. m] $ \i ->
+              assertEqual (show i) (v ! (i - n)) (sumSquarefreeNaive i)
 
 --
 -- Utilities
