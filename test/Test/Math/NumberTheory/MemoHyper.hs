@@ -4,13 +4,20 @@
 module Test.Math.NumberTheory.MemoHyper (tests) where
 
 import Control.Monad (forM_)
+import Data.List (genericLength)
 import Data.Vector.Generic qualified as Vector
-import Math.NumberTheory.MemoHyper (MemoHyper (..), UMemoHyper, memoHyperMertens)
+import Math.NumberTheory.MemoHyper
+  ( MemoHyper (..),
+    UMemoHyper,
+    memoHyperMertens,
+    memoHyperNumSquarefree,
+    memoHyperSumSquarefree,
+  )
 import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (primes)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
-import Test.Util (todoTest)
+import Test.Util (todoCode, todoTest)
 
 tests :: TestTree
 tests =
@@ -124,16 +131,65 @@ memoHyperMertensTests =
        in mh @?= mhNaive
 
 memoHyperNumSquarefreeTests :: TestTree
-memoHyperNumSquarefreeTests = todoTest "memoHyperNumSquarefree"
+memoHyperNumSquarefreeTests =
+  todoCode $
+    testCase "memoHyperNumSquarefree" $
+      forM_ [1 .. 100] $ \n ->
+        let mh :: UMemoHyper Int
+            mh = memoHyperNumSquarefree n
+
+            mhNaive :: UMemoHyper Int
+            mhNaive =
+              let sq = integerSquareRoot n
+               in MemoHyper
+                    { mhLimit = n,
+                      mhSqrtLimit = integerSquareRoot n,
+                      mhFuncVec =
+                        Vector.fromListN (fromIntegral sq) $
+                          map (numSquarefreeNaive . fromIntegral) [1 .. sq],
+                      mhHyperVec =
+                        Vector.fromListN (fromIntegral sq) $
+                          map (numSquarefreeNaive . fromIntegral . (n `quot`)) [1 .. sq]
+                    }
+         in mh @?= mhNaive
 
 memoHyperSumSquarefreeTests :: TestTree
-memoHyperSumSquarefreeTests = todoTest "memoHyperSumSquarefree"
+memoHyperSumSquarefreeTests =
+  todoCode $
+    testCase "memoHyperSumSquarefree" $
+      forM_ [1 .. 100] $ \n ->
+        let mh :: UMemoHyper Int
+            mh = memoHyperSumSquarefree n
+
+            mhNaive :: UMemoHyper Int
+            mhNaive =
+              let sq = integerSquareRoot n
+               in MemoHyper
+                    { mhLimit = n,
+                      mhSqrtLimit = integerSquareRoot n,
+                      mhFuncVec =
+                        Vector.fromListN (fromIntegral sq) $
+                          map (sumSquarefreeNaive . fromIntegral) [1 .. sq],
+                      mhHyperVec =
+                        Vector.fromListN (fromIntegral sq) $
+                          map (sumSquarefreeNaive . fromIntegral . (n `quot`)) [1 .. sq]
+                    }
+         in mh @?= mhNaive
 
 --
 -- Utilities
 --
 mertensNaive :: (Integral a) => a -> a
 mertensNaive n = sum (map mobiusNaive [1 .. n])
+
+numSquarefreeNaive :: (Integral a) => a -> a
+numSquarefreeNaive n = genericLength (filter isSquarefreeNaive [1 .. n])
+
+sumSquarefreeNaive :: (Integral a) => a -> a
+sumSquarefreeNaive n = sum (filter isSquarefreeNaive [1 .. n])
+
+isSquarefreeNaive :: (Integral a) => a -> Bool
+isSquarefreeNaive = not . isSquarefulNaive
 
 isSquarefulNaive :: (Integral a) => a -> Bool
 isSquarefulNaive n = any (`divides` n) (takeWhile (<= n) squares)
