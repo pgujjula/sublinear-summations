@@ -34,6 +34,10 @@ module Math.NumberTheory.HyperbolicConvolution
     hyperConvolve,
     hyperConvolveFast,
     hyperConvolveMobiusFast,
+
+    -- ** Hyperbolic convolutions over monads
+    hyperConvolveM,
+    hyperConvolveFastM,
   )
 where
 
@@ -143,27 +147,32 @@ hyperConvolveMobiusFast diff_f hyper_f n =
     n
 {-# INLINE hyperConvolveMobiusFast #-}
 
--- hyperConvolveFastM ::
---  (Num b) =>
---  -- | An implementation of @f@.
---  (Word -> ST s b) ->
---  -- | An implementation of @'hyper' n ('sigma' f)@
---  (Word -> ST s b) ->
---  -- | An implementation of @'diff' g@.
---  (Word -> ST s b) ->
---  -- | An implementation of @'hyper' n g@.
---  (Word -> ST s b) ->
---  Word ->
---  ST s b
--- hyperConvolveFastM f hyper_sigma_f diff_g hyper_g n = do
---  let sq = integerSquareRoot n
---  part1 <- fmap sum $ forM [1 .. sq] $ \i ->
---    liftA2 (*) (f i) (hyper_g i)
---  part2 <- fmap sum $ forM [1 .. sq] $ \i ->
---    liftA2 (*) (diff_g i) (hyper_sigma_f i)
---  correction <-
---    liftA2
---      (*)
---      (sum <$> forM [1 .. sq] f)
---      (sum <$> forM [1 .. sq] diff_g)
---  pure $ part1 + part2 - correction
+-- | Lifted 'hyperConvolve'.
+hyperConvolveM ::
+  (Monad m, Num b) =>
+  (Word -> m b) ->
+  (Word -> m b) ->
+  Word ->
+  m b
+hyperConvolveM f g n = sigmaM (mulM f (hyperM n g)) n
+{-# INLINE hyperConvolveM #-}
+
+-- | Lifted 'hyperConvolveFast'.
+hyperConvolveFastM ::
+  (Monad m, Num b) =>
+  -- | An implementation of @f@.
+  (Word -> m b) ->
+  -- | An implementation of @'hyperM' n ('sigmaM' f)@
+  (Word -> m b) ->
+  -- | An implementation of @'diffM' g@.
+  (Word -> m b) ->
+  -- | An implementation of @'hyperM' n g@.
+  (Word -> m b) ->
+  Word ->
+  m b
+hyperConvolveFastM f hyper_sigma_f diff_g hyper_g n = do
+  let sq = integerSquareRoot n
+  part1 <- sigmaM (mulM f hyper_g) sq
+  part2 <- sigmaM (mulM diff_g hyper_sigma_f) sq
+  correction <- mulM (sigmaM f) (sigmaM diff_g) sq
+  pure $ part1 + part2 - correction
