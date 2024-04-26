@@ -10,6 +10,8 @@
 -- Mutable MemoHypers.
 module Math.NumberTheory.MemoHyper.Mutable
   ( MMemoHyper (..),
+    UMMemoHyper,
+    VMMemoHyper,
 
     -- * Accessors
     readHyper,
@@ -25,6 +27,8 @@ where
 import Data.CallStack (HasCallStack)
 import Data.Vector.Generic.Mutable (MVector, PrimMonad, PrimState)
 import Data.Vector.Generic.Mutable qualified as MVector
+import Data.Vector.Mutable qualified as V
+import Data.Vector.Unboxed.Mutable qualified as U
 import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (word2Int)
 
@@ -34,6 +38,12 @@ data MMemoHyper v s b = MMemoHyper
     mmhFuncVec :: v s b,
     mmhHyperVec :: v s b
   }
+
+-- | A @'MMemoHyper'@ backed by unboxed vectors.
+type UMMemoHyper b = MMemoHyper U.MVector b
+
+-- | A @'MMemoHyper'@ backed by boxed vectors.
+type VMMemoHyper b = MMemoHyper V.MVector b
 
 --
 -- Construct MMemoHypers
