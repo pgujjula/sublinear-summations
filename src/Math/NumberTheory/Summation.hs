@@ -25,16 +25,13 @@ where
 
 import Control.Placeholder (todo)
 import Data.Bits (shiftR)
-import Data.List.ApplyMerge (applyMerge)
-import Data.List.Ordered (minus)
 import Math.NumberTheory.HyperbolicConvolution
   ( diff,
     hyper,
     hyperConvolveFast,
     hyperConvolveMobiusFast,
   )
-import Math.NumberTheory.Mobius (mobius')
-import Math.NumberTheory.Roots (integerSquareRoot)
+import Math.NumberTheory.Summation.Internal
 import SublinearSummation.Util (word2Int)
 
 --
@@ -110,38 +107,3 @@ primeSum = todo
 -- | The Mertens function.
 mertens :: (Integral a) => a -> a
 mertens = todo
-
-nonOneSquares :: [Word]
-nonOneSquares = map (^ (2 :: Int)) [2 ..]
-
-squarefrees :: [Word]
-squarefrees = [1 ..] `minus` applyMerge (*) nonOneSquares [1 ..]
-
--- | The number of square-free integers ≤ @n@.
-numSquarefree :: (Integral a) => a -> a
-numSquarefree n =
-  let n' :: Word
-      n' = fromIntegral (max 0 n)
-
-      sq :: Word
-      sq = integerSquareRoot n'
-   in fromIntegral $
-        sum $
-          flip map (takeWhile (<= sq) squarefrees) $ \i ->
-            mobius' i * fromIntegral (n' `quot` (i * i))
-
--- | The sum of the square-free integers ≤ @n@.
-sumSquarefree :: (Integral a) => a -> a
-sumSquarefree n =
-  let n' :: Word
-      n' = fromIntegral (max 0 n)
-
-      sq :: Word
-      sq = integerSquareRoot n'
-
-      f :: Word -> Int
-      f k = let k' = word2Int k in (k' * (k' + 1)) `quot` 2
-   in fromIntegral $
-        sum $
-          flip map (takeWhile (<= sq) squarefrees) $ \i ->
-            mobius' i * word2Int (i * i) * f (n' `quot` (i * i))

@@ -34,6 +34,7 @@ library:
   source-dirs: src
   exposed-modules:
   - Math.NumberTheory.Summation
+  - Math.NumberTheory.Summation.Internal
   - Math.NumberTheory.HyperbolicConvolution
   - Math.NumberTheory.MemoHyper
   - Math.NumberTheory.MemoHyper.Internal

@@ -68,7 +68,7 @@ import Math.NumberTheory.MemoHyper.Mutable (MMemoHyper (..))
 import Math.NumberTheory.MemoHyper.Mutable qualified as MMemoHyper
 import Math.NumberTheory.Mobius (mertensVec, mobius')
 import Math.NumberTheory.Roots (integerRoot, integerSquareRoot)
-import Math.NumberTheory.Summation (numSquarefree, sumSquarefree)
+import Math.NumberTheory.Summation.Internal (numSquarefree, sumSquarefree)
 import SublinearSummation.Util (word2Int)
 
 -- | @'MemoHyper' v n b@ memoizes a function of the form
