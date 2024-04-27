@@ -61,6 +61,8 @@ where
 import Control.Monad (forM, forM_)
 import Control.Monad.ST (ST, runST)
 import Control.Placeholder (todo)
+import Data.Function ((&))
+import Data.List (genericReplicate)
 import Data.Maybe (fromMaybe)
 import Data.Vector qualified as V
 import Data.Vector.Generic (Mutable, unsafeIndex, (!), (!?))
@@ -394,9 +396,12 @@ memoHyperPrimePi n = runST $ do
           else unsafeReadHyper phi_mmh (nqi * p)
       unsafeModifyHyper phi_mmh (\x -> x - right) nqi
 
-    let indices2 = takeWhile (>= iMin) [sq, sq - 1 .. 1]
-    forM_ indices2 $ \i -> do
-      let iqp = i `quot` p
+    let indices2 =
+          [sq, sq - 1 .. 1]
+            & zip (quotAll p sq)
+            & takeWhile ((>= iMin) . snd)
+
+    forM_ indices2 $ \(iqp, i) -> do
       let tooBig = b > ppi `unsafeIndex` integerSquareRoot (word2Int iqp)
       right <-
         if tooBig
@@ -412,6 +417,22 @@ memoHyperPrimePi n = runST $ do
 
 memoHyperPrimePhi :: Word -> VMemoHyper (U.Vector Int)
 memoHyperPrimePhi n = runST (memoHyperPrimePhiST n)
+
+-- quotAll p x returns [x `quot` p, (x - 1) `quot` p, .. 1 `quot` p]
+quotAll :: Word -> Word -> [Word]
+quotAll p x =
+  let (q, r) = x `quotRem` p
+   in if q == 0
+        then genericReplicate r 0
+        else
+          genericReplicate (r + 1) q
+            ++ concatMap
+              (genericReplicate p)
+              ( takeWhile
+                  (> 0)
+                  (iterate (\t -> t - 1) (q - 1))
+              )
+            ++ genericReplicate (p - 1) 0
 
 memoHyperPrimePhiST :: forall s. Word -> ST s (VMemoHyper (U.Vector Int))
 memoHyperPrimePhiST n = do
