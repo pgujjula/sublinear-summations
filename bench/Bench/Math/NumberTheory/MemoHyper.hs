@@ -4,14 +4,19 @@
 module Bench.Math.NumberTheory.MemoHyper (benchmarks) where
 
 import Bench.Util (todoBenchmark)
+import Data.Vector.Generic qualified as G
 import Math.NumberTheory.MemoHyper
-  ( UMemoHyper,
+  ( MemoHyper (..),
+    UMemoHyper,
     memoHyperMertens,
     memoHyperNumSquarefree,
     memoHyperPrimePi,
     memoHyperSumSquarefree,
     unMemoHyper,
   )
+import Math.NumberTheory.Prime.Count (primePi)
+import Math.NumberTheory.Roots (integerSquareRoot)
+import SublinearSummation.Util (word2Int)
 import Test.Tasty.Bench (Benchmark, bench, bgroup, nf)
 
 benchmarks :: Benchmark
@@ -41,6 +46,7 @@ benchmarks =
           bgroup
             "Primes"
             [ memoHyperPrimePiBenchmarks,
+              memoHyperPrimePiNaiveBenchmarks,
               memoHyperPrimeSumBenchmarks
             ],
           bgroup
@@ -95,13 +101,38 @@ memoHyperSumTotientBenchmarks = todoBenchmark "memoHyperSumTotient"
 
 -- Primes
 
+collectMemoHyper :: (G.Vector v a, Num a) => MemoHyper v a -> a
+collectMemoHyper mh = G.sum (mhFuncVec mh) + G.sum (mhHyperVec mh)
+
 memoHyperPrimePiBenchmarks :: Benchmark
 memoHyperPrimePiBenchmarks =
   bgroup "memoHyperPrimePi" $ flip map [(1 :: Int) .. 10] $ \i ->
     bench ("10^" ++ show i) $
       nf
-        (flip unMemoHyper 1 . memoHyperPrimePi)
+        (collectMemoHyper . memoHyperPrimePi)
         (10 ^ i)
+
+memoHyperPrimePiNaiveBenchmarks :: Benchmark
+memoHyperPrimePiNaiveBenchmarks =
+  bgroup "memoHyperPrimePiNaive" $ flip map [(1 :: Int) .. 10] $ \i ->
+    bench ("10^" ++ show i) $
+      nf
+        (collectMemoHyper . memoHyperPrimePiNaive)
+        (10 ^ i)
+
+memoHyperPrimePiNaive :: Word -> UMemoHyper Word
+memoHyperPrimePiNaive n =
+  let sq = integerSquareRoot n
+   in MemoHyper
+        { mhLimit = n,
+          mhSqrtLimit = sq,
+          mhFuncVec =
+            G.fromListN (word2Int sq) . flip map [1 .. sq] $ \i ->
+              primePi i,
+          mhHyperVec =
+            G.fromListN (word2Int sq) . flip map [1 .. sq] $ \i ->
+              primePi (n `quot` i)
+        }
 
 memoHyperPrimeSumBenchmarks :: Benchmark
 memoHyperPrimeSumBenchmarks = todoBenchmark "memoHyperPrimeSum"
