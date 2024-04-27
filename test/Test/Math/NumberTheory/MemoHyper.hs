@@ -6,17 +6,20 @@ module Test.Math.NumberTheory.MemoHyper (tests) where
 import Control.Monad (forM_)
 import Data.List (genericLength)
 import Data.Vector.Generic qualified as Vector
+import Data.Vector.Unboxed qualified as U
 import Math.NumberTheory.MemoHyper
   ( MemoHyper (..),
     UMemoHyper,
+    VMemoHyper,
     memoHyperMertens,
     memoHyperNumSquarefree,
+    memoHyperPrimePhi,
     memoHyperPrimePi,
     memoHyperSumSquarefree,
   )
-import Math.NumberTheory.Prime.Count (primePi)
+import Math.NumberTheory.Prime.Count (primePhi, primePi)
 import Math.NumberTheory.Roots (integerSquareRoot)
-import SublinearSummation.Util (primes)
+import SublinearSummation.Util (primes, word2Int)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 import Test.Util (todoTest)
@@ -48,6 +51,7 @@ tests =
           testGroup
             "Primes"
             [ memoHyperPrimePiTests,
+              memoHyperPrimePhiTests,
               memoHyperPrimeSumTests
             ],
           testGroup
@@ -120,6 +124,37 @@ memoHyperPrimePiTests =
                     mhHyperVec =
                       Vector.fromListN (fromIntegral sq) $
                         map (primePi . fromIntegral . (n `quot`)) [1 .. sq]
+                  }
+       in mh @?= mhNaive
+
+memoHyperPrimePhiTests :: TestTree
+memoHyperPrimePhiTests =
+  testCase "memoHyperPrimePhi" $
+    forM_ [1 .. 100] $ \n ->
+      let mh :: VMemoHyper (U.Vector Int)
+          mh = memoHyperPrimePhi n
+
+          mhNaive :: VMemoHyper (U.Vector Int)
+          mhNaive =
+            let sq = integerSquareRoot n
+             in MemoHyper
+                  { mhLimit = n,
+                    mhSqrtLimit = integerSquareRoot n,
+                    mhFuncVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        flip map [1 .. sq] $ \i ->
+                          let b = primePi (integerSquareRoot i)
+                           in Vector.fromListN (word2Int b + 1) $
+                                flip map [0 .. b] $ \j ->
+                                  word2Int (primePhi i j),
+                    mhHyperVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        flip map [1 .. sq] $ \i ->
+                          let nqi = n `quot` i
+                              b = primePi (integerSquareRoot nqi)
+                           in Vector.fromListN (word2Int b + 1) $
+                                flip map [0 .. b] $ \j ->
+                                  word2Int (primePhi nqi j)
                   }
        in mh @?= mhNaive
 
