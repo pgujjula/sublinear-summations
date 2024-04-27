@@ -344,41 +344,26 @@ memoHyperPrimePi n = runST $ do
   let ppi = primePiVec sq
   let bMax = ppi ! word2Int sq
   let writeDone j = do
-        let doneIndicesLo =
-              let sq_low :: Word
-                  sq_low =
-                    if j == 0
-                      then 0
-                      else ps ! (word2Int j - 1)
-                  low = max 1 (sq_low * sq_low)
+        let j' :: Int
+            j' = word2Int j
 
-                  sq_high :: Word
-                  sq_high =
-                    if word2Int j == G.length ps
-                      then sq
-                      else (ps ! word2Int j) - 1
+            doneIndicesLo :: [Word]
+            doneIndicesLo =
+              let low :: Word
+                  low = maybe minBound square (ps !? (j' - 1))
 
                   high :: Word
-                  high = min sq (square (sq_high + 1) - 1)
-               in [low .. high]
+                  high = maybe maxBound square (ps !? j')
+               in [max 1 low .. min sq (high - 1)]
 
-        let doneIndicesHi =
-              let sq_low =
-                    if j == 0
-                      then 0
-                      else ps ! (word2Int j - 1)
-                  sq_high =
-                    if word2Int j == G.length ps
-                      then sq + 1
-                      else ps ! word2Int j
-                  high =
-                    min
-                      sq
-                      (n `quot` max 1 (square sq_low))
-                  low = max 1 $ (n `quot` square sq_high) + 1
+            doneIndicesHi :: [Word]
+            doneIndicesHi =
+              let low :: Word
+                  low = maybe minBound ((n `quot`) . square) (ps !? j')
 
-                  xs = [high, high - 1 .. low]
-               in map (n `quot`) xs
+                  high :: Word
+                  high = maybe maxBound ((n `quot`) . square) (ps !? (j' - 1))
+               in map (n `quot`) [max 1 (low + 1) .. min sq high]
 
         forM_ doneIndicesLo $ \i -> do
           phi <- unsafeReadSmall phi_mmh i
