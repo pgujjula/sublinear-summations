@@ -398,21 +398,20 @@ memoHyperPrimePi n = runST $ do
 
     let indices1 = takeWhile (\nqi -> n `quot` nqi >= iMin) [1 .. sq]
     forM_ indices1 $ \nqi -> do
-      let i = n `quot` nqi
-      let iqp = i `quot` p
-      let tooBig = b - 1 >= ppi ! integerSquareRoot (word2Int iqp)
+      let iqp = n `quot` (nqi * p)
+      let tooBig = b > ppi ! integerSquareRoot (word2Int iqp)
       right <-
         if tooBig
           then do
-            pi_iqp <- unsafeReadHyper pi_mmh (n `quot` iqp)
+            pi_iqp <- unsafeReadHyper pi_mmh (nqi * p)
             pure $ pi_iqp - b + 2
-          else unsafeReadHyper phi_mmh (n `quot` iqp)
+          else unsafeReadHyper phi_mmh (nqi * p)
       unsafeModifyHyper phi_mmh (\x -> x - right) nqi
 
     let indices2 = takeWhile (>= iMin) [sq, sq - 1 .. 1]
     forM_ indices2 $ \i -> do
       let iqp = i `quot` p
-      let tooBig = b - 1 >= ppi ! integerSquareRoot (word2Int iqp)
+      let tooBig = b > ppi ! integerSquareRoot (word2Int iqp)
       right <-
         if tooBig
           then do
