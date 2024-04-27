@@ -15,6 +15,7 @@ module Math.NumberTheory.MemoHyper.Mutable
 
     -- * Accessors
     readHyper,
+    readHyperMaybe,
     readSmall,
     writeHyper,
     writeSmall,
@@ -74,6 +75,16 @@ readHyper mmh i =
     then MVector.read (mmhHyperVec mmh) (toIndex i)
     else MVector.read (mmhFuncVec mmh) (toIndex (mmhLimit mmh `quot` i))
 {-# INLINE readHyper #-}
+
+readHyperMaybe ::
+  (PrimMonad m, MVector v b) =>
+  MMemoHyper v (PrimState m) b ->
+  Word ->
+  m (Maybe b)
+readHyperMaybe mmh i =
+  if i <= mmhSqrtLimit mmh
+    then MVector.readMaybe (mmhHyperVec mmh) (toIndex i)
+    else MVector.readMaybe (mmhFuncVec mmh) (toIndex (mmhLimit mmh `quot` i))
 
 readSmall ::
   (HasCallStack, PrimMonad m, MVector v b) =>
