@@ -8,6 +8,7 @@ import Data.Vector.Generic qualified as G
 import Math.NumberTheory.MemoHyper
   ( MemoHyper (..),
     UMemoHyper,
+    memoHyperIntegerSquareRoot,
     memoHyperMertens,
     memoHyperNumSquarefree,
     memoHyperPrimePi,
@@ -54,6 +55,10 @@ benchmarks =
             [ memoHyperMertensBenchmarks,
               memoHyperNumSquarefreeBenchmarks,
               memoHyperSumSquarefreeBenchmarks
+            ],
+          bgroup
+            "Miscellaneous"
+            [ memoHyperIntegerSquareRootBenchmarks
             ]
         ]
     ]
@@ -164,5 +169,15 @@ memoHyperSumSquarefreeBenchmarks =
       nf
         ( flip unMemoHyper 1
             . (memoHyperSumSquarefree :: Word -> UMemoHyper Int)
+        )
+        (10 ^ i)
+
+memoHyperIntegerSquareRootBenchmarks :: Benchmark
+memoHyperIntegerSquareRootBenchmarks =
+  bgroup "memoHyperIntegerSquareRoot" $ flip map [(1 :: Int) .. 12] $ \i ->
+    bench ("10^" ++ show i) $
+      nf
+        ( collectMemoHyper
+            . (memoHyperIntegerSquareRoot :: Word -> UMemoHyper Int)
         )
         (10 ^ i)
