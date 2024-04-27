@@ -70,6 +70,8 @@ import Math.NumberTheory.MemoHyper.Internal (numSquarefreeVec, sumSquarefreeVec)
 import Math.NumberTheory.MemoHyper.Mutable
   ( MMemoHyper (..),
     UMMemoHyper,
+    unsafeModifyHyper,
+    unsafeModifySmall,
     unsafeReadHyper,
     unsafeReadSmall,
     unsafeWriteHyper,
@@ -395,7 +397,6 @@ memoHyperPrimePi n = runST $ do
     forM_ indices1 $ \nqi -> do
       let i = n `quot` nqi
       let iqp = i `quot` p
-      left <- unsafeReadHyper phi_mmh nqi
       let tooBig = b - 1 >= ppi ! integerSquareRoot (word2Int iqp)
       right <-
         if tooBig
@@ -403,12 +404,11 @@ memoHyperPrimePi n = runST $ do
             pi_iqp <- unsafeReadHyper pi_mmh (n `quot` iqp)
             pure $ pi_iqp - b + 2
           else unsafeReadHyper phi_mmh (n `quot` iqp)
-      unsafeWriteHyper phi_mmh nqi (left - right)
+      unsafeModifyHyper phi_mmh (\x -> x - right) nqi
 
     let indices2 = takeWhile (>= iMin) [sq, sq - 1 .. 1]
     forM_ indices2 $ \i -> do
       let iqp = i `quot` p
-      left <- unsafeReadSmall phi_mmh i
       let tooBig = b - 1 >= ppi ! integerSquareRoot (word2Int iqp)
       right <-
         if tooBig
@@ -416,7 +416,7 @@ memoHyperPrimePi n = runST $ do
             pi_iqp <- unsafeReadSmall pi_mmh iqp
             pure $ pi_iqp - b + 2
           else unsafeReadSmall phi_mmh iqp
-      unsafeWriteSmall phi_mmh i (left - right)
+      unsafeModifySmall phi_mmh (\x -> x - right) i
 
     writeDone b
 
