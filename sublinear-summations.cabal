@@ -94,6 +94,7 @@ benchmark apply-merge-benchmarks
   other-modules:
       Bench.Math.NumberTheory.HyperbolicConvolution
       Bench.Math.NumberTheory.MemoHyper
+      Bench.Math.NumberTheory.MemoHyper.Internal
       Bench.Math.NumberTheory.Mobius
       Bench.Math.NumberTheory.Summation
       Bench.SublinearSummation.Util
