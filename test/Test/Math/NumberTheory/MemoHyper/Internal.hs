@@ -13,7 +13,6 @@ import Math.NumberTheory.MemoHyper.Internal
   )
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase)
-import Test.Util (todoCode)
 
 tests :: TestTree
 tests =
@@ -44,7 +43,7 @@ sumSquarefreeVecTests =
 
 totientVecTests :: TestTree
 totientVecTests =
-  todoCode . testCase "totientVec" $ do
+  testCase "totientVec" $ do
     forM_ [0 .. 30] $ \n ->
       forM_ [n .. 30] $ \m ->
         let v = totientVec (fromIntegral n) (fromIntegral m)
