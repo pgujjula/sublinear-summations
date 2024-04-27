@@ -63,7 +63,7 @@ import Control.Monad.ST (ST, runST)
 import Control.Placeholder (todo)
 import Data.Maybe (fromMaybe)
 import Data.Vector qualified as V
-import Data.Vector.Generic (Mutable, (!), (!?))
+import Data.Vector.Generic (Mutable, unsafeIndex, (!), (!?))
 import Data.Vector.Generic qualified as G
 import Data.Vector.Generic.Mutable (PrimMonad, PrimState)
 import Data.Vector.Mutable qualified as MV
@@ -382,24 +382,24 @@ memoHyperPrimePi n = runST $ do
 
         forM_ doneIndicesLo $ \i -> do
           phi <- unsafeReadSmall phi_mmh i
-          let pi' = ppi ! integerSquareRoot (word2Int i)
+          let pi' = ppi `unsafeIndex` integerSquareRoot (word2Int i)
           unsafeWriteSmall pi_mmh i (phi + pi' - 1)
 
         forM_ doneIndicesHi $ \i -> do
           let nqi = n `quot` i
           phi <- unsafeReadHyper phi_mmh nqi
-          let pi' = ppi ! integerSquareRoot (word2Int i)
+          let pi' = ppi `unsafeIndex` integerSquareRoot (word2Int i)
           unsafeWriteHyper pi_mmh nqi (phi + pi' - 1)
 
   writeDone 0
   forM_ [1 .. bMax] $ \b -> do
-    let p = ps ! (word2Int b - 1)
-    let iMin = square (ps ! word2Int (b - 1))
+    let p = ps `unsafeIndex` (word2Int b - 1)
+    let iMin = square (ps `unsafeIndex` word2Int (b - 1))
 
     let indices1 = takeWhile (\nqi -> n `quot` nqi >= iMin) [1 .. sq]
     forM_ indices1 $ \nqi -> do
       let iqp = n `quot` (nqi * p)
-      let tooBig = b > ppi ! integerSquareRoot (word2Int iqp)
+      let tooBig = b > ppi `unsafeIndex` integerSquareRoot (word2Int iqp)
       right <-
         if tooBig
           then do
@@ -411,7 +411,7 @@ memoHyperPrimePi n = runST $ do
     let indices2 = takeWhile (>= iMin) [sq, sq - 1 .. 1]
     forM_ indices2 $ \i -> do
       let iqp = i `quot` p
-      let tooBig = b > ppi ! integerSquareRoot (word2Int iqp)
+      let tooBig = b > ppi `unsafeIndex` integerSquareRoot (word2Int iqp)
       right <-
         if tooBig
           then do
