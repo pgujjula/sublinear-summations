@@ -19,7 +19,7 @@ import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (primes)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
-import Test.Util (todoCode, todoTest)
+import Test.Util (todoTest)
 
 tests :: TestTree
 tests =
@@ -104,7 +104,7 @@ memoHyperSumTotientTests = todoTest "memoHyperSumTotient"
 
 memoHyperPrimePiTests :: TestTree
 memoHyperPrimePiTests =
-  todoCode . testCase "memoHyperPrimePi" $
+  testCase "memoHyperPrimePi" $
     forM_ [1 .. 100] $ \n ->
       let mh :: UMemoHyper Word
           mh = memoHyperPrimePi n
