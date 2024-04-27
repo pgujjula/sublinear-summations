@@ -5,9 +5,11 @@
 module Math.NumberTheory.MemoHyper.Internal
   ( numSquarefreeVec,
     sumSquarefreeVec,
+    totientVec,
   )
 where
 
+import Control.Placeholder (todo)
 import Data.Vector.Generic qualified as G
 import Data.Vector.Unboxed qualified as U
 import Math.NumberTheory.Mobius (mobiusVec)
@@ -20,3 +22,6 @@ numSquarefreeVec n m =
 sumSquarefreeVec :: Word -> Word -> U.Vector Int
 sumSquarefreeVec n m =
   G.drop (word2Int n) . G.scanl1 (+) . G.imap (*) . G.map abs $ mobiusVec 0 m
+
+totientVec :: Word -> Word -> U.Vector Int
+totientVec n m = todo

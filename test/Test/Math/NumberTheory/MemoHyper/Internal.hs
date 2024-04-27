@@ -6,16 +6,22 @@ module Test.Math.NumberTheory.MemoHyper.Internal (tests) where
 import Control.Monad (forM_)
 import Data.List (genericLength)
 import Data.Vector.Generic ((!))
-import Math.NumberTheory.MemoHyper.Internal (numSquarefreeVec, sumSquarefreeVec)
+import Math.NumberTheory.MemoHyper.Internal
+  ( numSquarefreeVec,
+    sumSquarefreeVec,
+    totientVec,
+  )
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase)
+import Test.Util (todoCode)
 
 tests :: TestTree
 tests =
   testGroup
     "Math.NumberTheory.MemoHyper.Internal"
     [ numSquarefreeVecTests,
-      sumSquarefreeVecTests
+      sumSquarefreeVecTests,
+      totientVecTests
     ]
 
 numSquarefreeVecTests :: TestTree
@@ -36,6 +42,15 @@ sumSquarefreeVecTests =
          in forM_ [n .. m] $ \i ->
               assertEqual (show i) (v ! (i - n)) (sumSquarefreeNaive i)
 
+totientVecTests :: TestTree
+totientVecTests =
+  todoCode . testCase "totientVec" $ do
+    forM_ [0 .. 30] $ \n ->
+      forM_ [n .. 30] $ \m ->
+        let v = totientVec (fromIntegral n) (fromIntegral m)
+         in forM_ [n .. m] $ \i ->
+              assertEqual (show (n, m, i)) (v ! (i - n)) (totientNaive i)
+
 --
 -- Utilities
 --
@@ -44,6 +59,9 @@ numSquarefreeNaive n = genericLength (filter isSquarefreeNaive [1 .. n])
 
 sumSquarefreeNaive :: (Integral a) => a -> a
 sumSquarefreeNaive n = sum (filter isSquarefreeNaive [1 .. n])
+
+totientNaive :: (Integral a) => a -> a
+totientNaive n = genericLength (filter (\x -> gcd n x == 1) [1 .. n])
 
 isSquarefreeNaive :: (Integral a) => a -> Bool
 isSquarefreeNaive = not . isSquarefulNaive
