@@ -70,10 +70,10 @@ import Math.NumberTheory.MemoHyper.Internal (numSquarefreeVec, sumSquarefreeVec)
 import Math.NumberTheory.MemoHyper.Mutable
   ( MMemoHyper (..),
     UMMemoHyper,
-    readHyper,
-    readSmall,
-    writeHyper,
-    writeSmall,
+    unsafeReadHyper,
+    unsafeReadSmall,
+    unsafeWriteHyper,
+    unsafeWriteSmall,
   )
 import Math.NumberTheory.MemoHyper.Mutable qualified as MMemoHyper
 import Math.NumberTheory.Mobius (mertensVec, mobius')
@@ -227,15 +227,15 @@ memoHyperFixST ::
 memoHyperFixST n rec = runST $ do
   mmh <- MMemoHyper.new n
   let sq = integerSquareRoot n
-      fh = MMemoHyper.readHyper mmh
+      fh = MMemoHyper.unsafeReadHyper mmh
 
   forM_ [(1 :: Word) .. sq] $ \i -> do
     x <- rec fh (n `quot` i)
-    MMemoHyper.writeSmall mmh i x
+    MMemoHyper.unsafeWriteSmall mmh i x
 
   forM_ [sq, sq - 1 .. (1 :: Word)] $ \i -> do
     x <- rec fh i
-    MMemoHyper.writeHyper mmh i x
+    MMemoHyper.unsafeWriteHyper mmh i x
 
   freeze mmh
 
@@ -334,8 +334,8 @@ memoHyperPrimePi n = runST $ do
   let sq = integerSquareRoot n
   let ps = primesVec 0 sq
   forM_ [1 .. sq] $ \i -> do
-    writeSmall phi_mmh i i
-    writeHyper phi_mmh i (n `quot` i)
+    unsafeWriteSmall phi_mmh i i
+    unsafeWriteHyper phi_mmh i (n `quot` i)
   let ppi = primePiVec sq
   let bMax = ppi ! word2Int sq
   let writeDone j = do
@@ -376,15 +376,15 @@ memoHyperPrimePi n = runST $ do
                in map (n `quot`) xs
 
         forM_ doneIndicesLo $ \i -> do
-          phi <- readSmall phi_mmh i
+          phi <- unsafeReadSmall phi_mmh i
           let pi' = ppi ! integerSquareRoot (word2Int i)
-          writeSmall pi_mmh i (phi + pi' - 1)
+          unsafeWriteSmall pi_mmh i (phi + pi' - 1)
 
         forM_ doneIndicesHi $ \i -> do
           let nqi = n `quot` i
-          phi <- readHyper phi_mmh nqi
+          phi <- unsafeReadHyper phi_mmh nqi
           let pi' = ppi ! integerSquareRoot (word2Int i)
-          writeHyper pi_mmh nqi (phi + pi' - 1)
+          unsafeWriteHyper pi_mmh nqi (phi + pi' - 1)
 
   writeDone 0
   forM_ [1 .. bMax] $ \b -> do
@@ -395,28 +395,28 @@ memoHyperPrimePi n = runST $ do
     forM_ indices1 $ \nqi -> do
       let i = n `quot` nqi
       let iqp = i `quot` p
-      left <- readHyper phi_mmh nqi
+      left <- unsafeReadHyper phi_mmh nqi
       let tooBig = b - 1 >= ppi ! integerSquareRoot (word2Int iqp)
       right <-
         if tooBig
           then do
-            pi_iqp <- readHyper pi_mmh (n `quot` iqp)
+            pi_iqp <- unsafeReadHyper pi_mmh (n `quot` iqp)
             pure $ pi_iqp - b + 2
-          else readHyper phi_mmh (n `quot` iqp)
-      writeHyper phi_mmh nqi (left - right)
+          else unsafeReadHyper phi_mmh (n `quot` iqp)
+      unsafeWriteHyper phi_mmh nqi (left - right)
 
     let indices2 = takeWhile (>= iMin) [sq, sq - 1 .. 1]
     forM_ indices2 $ \i -> do
       let iqp = i `quot` p
-      left <- readSmall phi_mmh i
+      left <- unsafeReadSmall phi_mmh i
       let tooBig = b - 1 >= ppi ! integerSquareRoot (word2Int iqp)
       right <-
         if tooBig
           then do
-            pi_iqp <- readSmall pi_mmh iqp
+            pi_iqp <- unsafeReadSmall pi_mmh iqp
             pure $ pi_iqp - b + 2
-          else readSmall phi_mmh iqp
-      writeSmall phi_mmh i (left - right)
+          else unsafeReadSmall phi_mmh iqp
+      unsafeWriteSmall phi_mmh i (left - right)
 
     writeDone b
 
