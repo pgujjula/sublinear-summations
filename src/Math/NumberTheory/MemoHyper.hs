@@ -52,6 +52,9 @@ module Math.NumberTheory.MemoHyper
     memoHyperMertens,
     memoHyperNumSquarefree,
     memoHyperSumSquarefree,
+
+    -- ** Miscellaneous
+    memoHyperIntegerSquareRoot,
   )
 where
 
@@ -81,7 +84,7 @@ import Math.NumberTheory.MemoHyper.Mutable qualified as MMemoHyper
 import Math.NumberTheory.Mobius (mertensVec, mobius')
 import Math.NumberTheory.Roots (integerRoot, integerSquareRoot)
 import Math.NumberTheory.Summation.Internal (numSquarefree, sumSquarefree)
-import SublinearSummation.Util (primePiVec, primesVec, word2Int)
+import SublinearSummation.Util (int2Word, primePiVec, primesVec, word2Int)
 
 -- | @'MemoHyper' v n b@ memoizes a function of the form
 --  \(x \mapsto f \left(\left\lfloor \frac{n}{x} \right\rfloor\right)\)
@@ -511,3 +514,19 @@ memoHyperPrimePhiST n = do
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.primeSum'.
 memoHyperPrimeSum :: (G.Vector v a, Integral a) => Word -> MemoHyper v a
 memoHyperPrimeSum = todo
+
+-- | A 'MemoHyper' for 'Math.NumberTheory.Roots.integerSquareRoot'
+memoHyperIntegerSquareRoot ::
+  (G.Vector v a, Integral a) => Word -> MemoHyper v a
+memoHyperIntegerSquareRoot n =
+  let sq = integerSquareRoot n
+      fv = G.generate (word2Int sq) $ \i ->
+        fromIntegral (integerSquareRoot (i + 1))
+      hv = G.generate (word2Int sq) $ \i ->
+        fromIntegral (integerSquareRoot (n `quot` int2Word (i + 1)))
+   in MemoHyper
+        { mhLimit = n,
+          mhSqrtLimit = sq,
+          mhFuncVec = fv,
+          mhHyperVec = hv
+        }

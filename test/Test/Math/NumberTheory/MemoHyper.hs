@@ -11,6 +11,7 @@ import Math.NumberTheory.MemoHyper
   ( MemoHyper (..),
     UMemoHyper,
     VMemoHyper,
+    memoHyperIntegerSquareRoot,
     memoHyperMertens,
     memoHyperNumSquarefree,
     memoHyperPrimePhi,
@@ -59,6 +60,10 @@ tests =
             [ memoHyperMertensTests,
               memoHyperNumSquarefreeTests,
               memoHyperSumSquarefreeTests
+            ],
+          testGroup
+            "Miscellaneous"
+            [ memoHyperIntegerSquareRootTests
             ]
         ]
     ]
@@ -226,6 +231,33 @@ memoHyperSumSquarefreeTests =
                     mhHyperVec =
                       Vector.fromListN (fromIntegral sq) $
                         map (sumSquarefreeNaive . fromIntegral . (n `quot`)) [1 .. sq]
+                  }
+       in mh @?= mhNaive
+
+memoHyperIntegerSquareRootTests :: TestTree
+memoHyperIntegerSquareRootTests =
+  testCase "memoHyperIntegerSquareRoot" $
+    forM_ [1 .. 100] $ \n ->
+      let mh :: UMemoHyper Int
+          mh = memoHyperIntegerSquareRoot n
+
+          mhNaive :: UMemoHyper Int
+          mhNaive =
+            let sq = integerSquareRoot n
+             in MemoHyper
+                  { mhLimit = n,
+                    mhSqrtLimit = integerSquareRoot n,
+                    mhFuncVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map
+                          (integerSquareRoot . fromIntegral)
+                          [1 .. sq],
+                    mhHyperVec =
+                      Vector.fromListN (fromIntegral sq)
+                        . flip map [1 .. sq]
+                        $ integerSquareRoot
+                          . fromIntegral
+                          . (n `quot`)
                   }
        in mh @?= mhNaive
 
