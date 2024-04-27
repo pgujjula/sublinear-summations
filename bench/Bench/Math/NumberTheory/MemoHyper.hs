@@ -4,7 +4,14 @@
 module Bench.Math.NumberTheory.MemoHyper (benchmarks) where
 
 import Bench.Util (todoBenchmark)
-import Math.NumberTheory.MemoHyper (UMemoHyper, memoHyperMertens, memoHyperNumSquarefree, memoHyperSumSquarefree, unMemoHyper)
+import Math.NumberTheory.MemoHyper
+  ( UMemoHyper,
+    memoHyperMertens,
+    memoHyperNumSquarefree,
+    memoHyperPrimePi,
+    memoHyperSumSquarefree,
+    unMemoHyper,
+  )
 import Test.Tasty.Bench (Benchmark, bench, bgroup, nf)
 
 benchmarks :: Benchmark
@@ -89,7 +96,12 @@ memoHyperSumTotientBenchmarks = todoBenchmark "memoHyperSumTotient"
 -- Primes
 
 memoHyperPrimePiBenchmarks :: Benchmark
-memoHyperPrimePiBenchmarks = todoBenchmark "memoHyperPrimePi"
+memoHyperPrimePiBenchmarks =
+  bgroup "memoHyperPrimePi" $ flip map [(1 :: Int) .. 10] $ \i ->
+    bench ("10^" ++ show i) $
+      nf
+        (flip unMemoHyper 1 . memoHyperPrimePi)
+        (10 ^ i)
 
 memoHyperPrimeSumBenchmarks :: Benchmark
 memoHyperPrimeSumBenchmarks = todoBenchmark "memoHyperPrimeSum"
