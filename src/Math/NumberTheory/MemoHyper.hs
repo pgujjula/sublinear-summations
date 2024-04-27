@@ -384,7 +384,7 @@ memoHyperPrimePi n = runST $ do
     let iMin = square (ps `unsafeIndex` word2Int (b - 1))
 
     let nqiMin = n `quot` iMin
-    let indices1 = takeWhile (<= nqiMin) [1 .. sq]
+    let indices1 = [1 .. min sq nqiMin]
     forM_ indices1 $ \nqi -> do
       let iqp = n `quot` (nqi * p)
       let tooBig = b > ppi `unsafeIndex` integerSquareRoot (word2Int iqp)
