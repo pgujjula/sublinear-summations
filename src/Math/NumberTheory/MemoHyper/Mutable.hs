@@ -14,15 +14,25 @@ module Math.NumberTheory.MemoHyper.Mutable
     VMMemoHyper,
 
     -- * Accessors
+
+    -- ** Read
     readHyper,
     readHyperMaybe,
     readSmall,
     unsafeReadHyper,
     unsafeReadSmall,
+
+    -- ** Write
     writeHyper,
     writeSmall,
     unsafeWriteHyper,
     unsafeWriteSmall,
+
+    -- ** Modify
+    modifyHyper,
+    modifySmall,
+    unsafeModifyHyper,
+    unsafeModifySmall,
 
     -- * Construction
     new,
@@ -161,6 +171,48 @@ unsafeWriteSmall ::
   m ()
 unsafeWriteSmall mmh i = MVector.unsafeWrite (mmhFuncVec mmh) (toIndex i)
 {-# INLINE unsafeWriteSmall #-}
+
+modifyHyper ::
+  (HasCallStack, PrimMonad m, MVector v a) =>
+  MMemoHyper v (PrimState m) a ->
+  (a -> a) ->
+  Word ->
+  m ()
+modifyHyper mmh f i =
+  if i <= mmhSqrtLimit mmh
+    then MVector.modify (mmhHyperVec mmh) f (toIndex i)
+    else MVector.modify (mmhFuncVec mmh) f (toIndex (mmhLimit mmh `quot` i))
+{-# INLINE modifyHyper #-}
+
+modifySmall ::
+  (HasCallStack, PrimMonad m, MVector v a) =>
+  MMemoHyper v (PrimState m) a ->
+  (a -> a) ->
+  Word ->
+  m ()
+modifySmall mmh f i = MVector.modify (mmhFuncVec mmh) f (toIndex i)
+{-# INLINE modifySmall #-}
+
+unsafeModifyHyper ::
+  (PrimMonad m, MVector v a) =>
+  MMemoHyper v (PrimState m) a ->
+  (a -> a) ->
+  Word ->
+  m ()
+unsafeModifyHyper mmh f i =
+  if i <= mmhSqrtLimit mmh
+    then MVector.unsafeModify (mmhHyperVec mmh) f (toIndex i)
+    else MVector.unsafeModify (mmhFuncVec mmh) f (toIndex (mmhLimit mmh `quot` i))
+{-# INLINE unsafeModifyHyper #-}
+
+unsafeModifySmall ::
+  (PrimMonad m, MVector v a) =>
+  MMemoHyper v (PrimState m) a ->
+  (a -> a) ->
+  Word ->
+  m ()
+unsafeModifySmall mmh f i = MVector.unsafeModify (mmhFuncVec mmh) f (toIndex i)
+{-# INLINE unsafeModifySmall #-}
 
 toIndex :: Word -> Int
 toIndex k = word2Int k - 1
