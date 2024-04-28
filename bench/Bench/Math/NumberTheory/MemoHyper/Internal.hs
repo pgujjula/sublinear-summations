@@ -4,7 +4,9 @@
 module Bench.Math.NumberTheory.MemoHyper.Internal (benchmarks) where
 
 import Bench.Util (todoBenchmark)
-import Test.Tasty.Bench (Benchmark, bgroup)
+import Data.Vector.Generic qualified as Vector
+import Math.NumberTheory.MemoHyper.Internal (totientVec)
+import Test.Tasty.Bench (Benchmark, bench, bgroup, nf)
 
 benchmarks :: Benchmark
 benchmarks =
@@ -22,4 +24,7 @@ sumSquarefreeVecBenchmarks :: Benchmark
 sumSquarefreeVecBenchmarks = todoBenchmark "sumSquarefreeVec"
 
 totientVecBenchmarks :: Benchmark
-totientVecBenchmarks = todoBenchmark "totientVec"
+totientVecBenchmarks =
+  bgroup "totientVec" $ flip map [(1 :: Int) .. 8] $ \i ->
+    bench ("10^" ++ show i) $
+      nf (Vector.last . totientVec 0) (10 ^ i)
