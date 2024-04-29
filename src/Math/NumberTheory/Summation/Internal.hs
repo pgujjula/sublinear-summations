@@ -9,11 +9,17 @@
 module Math.NumberTheory.Summation.Internal
   ( numSquarefree,
     sumSquarefree,
+    sumTotient,
   )
 where
 
 import Data.List.ApplyMerge (applyMerge)
 import Data.List.Ordered (minus)
+import Math.NumberTheory.HyperbolicConvolution
+  ( diff,
+    hyper,
+    hyperConvolveMobiusFast,
+  )
 import Math.NumberTheory.Mobius (mobius')
 import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (word2Int)
@@ -52,3 +58,25 @@ sumSquarefree n =
         sum $
           flip map (takeWhile (<= sq) squarefrees) $ \i ->
             mobius' i * word2Int (i * i) * f (n' `quot` (i * i))
+
+-- | Let \(φ(n)\) be
+-- [Euler's totient function](https://en.wikipedia.org/wiki/Euler%27s_totient_function),
+-- i.e., the number of positive integers ≤ @n@ that are relatively prime to @n@.
+-- Then @'sumTotient' n@ is the sum of \(φ\) from @1@ to @n@.
+sumTotient :: (Integral a) => a -> a
+sumTotient n =
+  let n' :: Word
+      n' = fromIntegral (max 0 n)
+
+      square :: Word -> Int
+      square x = let x' = word2Int x in x' * x'
+      {-# INLINE square #-}
+
+      s =
+        fromIntegral $
+          hyperConvolveMobiusFast
+            (diff square)
+            (hyper n' square)
+            n'
+   in (s + 1) `quot` 2
+{-# INLINE sumTotient #-}

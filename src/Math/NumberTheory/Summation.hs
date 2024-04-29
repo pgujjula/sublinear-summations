@@ -25,19 +25,17 @@ where
 
 import Control.Placeholder (todo)
 import Data.Bits (shiftR)
-import Math.NumberTheory.HyperbolicConvolution
-  ( diff,
-    hyper,
-    hyperConvolveFast,
-    hyperConvolveMobiusFast,
-  )
+import Math.NumberTheory.HyperbolicConvolution (hyperConvolveFast)
 import Math.NumberTheory.MemoHyper
   ( UMemoHyper,
     memoHyperMertens,
     unMemoHyper,
   )
 import Math.NumberTheory.Summation.Internal
-import SublinearSummation.Util (word2Int)
+  ( numSquarefree,
+    sumSquarefree,
+    sumTotient,
+  )
 
 --
 -- Divisor functions
@@ -70,28 +68,6 @@ sumSumDivisors n =
         . fromIntegral
         . max 0
         $ n
-
--- | Let \(φ(n)\) be
--- [Euler's totient function](https://en.wikipedia.org/wiki/Euler%27s_totient_function),
--- i.e., the number of positive integers ≤ @n@ that are relatively prime to @n@.
--- Then @'sumTotient' n@ is the sum of \(φ\) from @1@ to @n@.
-sumTotient :: (Integral a) => a -> a
-sumTotient n =
-  let n' :: Word
-      n' = fromIntegral (max 0 n)
-
-      square :: Word -> Int
-      square x = let x' = word2Int x in x' * x'
-      {-# INLINE square #-}
-
-      s =
-        fromIntegral $
-          hyperConvolveMobiusFast
-            (diff square)
-            (hyper n' square)
-            n'
-   in (s + 1) `quot` 2
-{-# INLINE sumTotient #-}
 
 --
 -- Primes
