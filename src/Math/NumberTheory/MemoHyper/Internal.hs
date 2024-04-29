@@ -7,6 +7,7 @@ module Math.NumberTheory.MemoHyper.Internal
   ( numSquarefreeVec,
     sumSquarefreeVec,
     totientVec,
+    sumTotientVec,
   )
 where
 
@@ -55,6 +56,9 @@ totientVec n m =
 
         G.unsafeFreeze res
    in u'
+
+sumTotientVec :: Word -> Word -> U.Vector Int
+sumTotientVec n m = G.drop (word2Int n) . G.scanl1 (+) $ totientVec 0 m
 
 smallestMultipleGE :: (Integral a) => a -> a -> a
 smallestMultipleGE p n = p * (((n - 1) `quot` p) + 1)

@@ -9,6 +9,7 @@ import Data.Vector.Generic ((!))
 import Math.NumberTheory.MemoHyper.Internal
   ( numSquarefreeVec,
     sumSquarefreeVec,
+    sumTotientVec,
     totientVec,
   )
 import Test.Tasty (TestTree, testGroup)
@@ -20,7 +21,8 @@ tests =
     "Math.NumberTheory.MemoHyper.Internal"
     [ numSquarefreeVecTests,
       sumSquarefreeVecTests,
-      totientVecTests
+      totientVecTests,
+      sumTotientVecTests
     ]
 
 numSquarefreeVecTests :: TestTree
@@ -50,6 +52,15 @@ totientVecTests =
          in forM_ [n .. m] $ \i ->
               assertEqual (show (n, m, i)) (v ! (i - n)) (totientNaive i)
 
+sumTotientVecTests :: TestTree
+sumTotientVecTests =
+  testCase "sumTotientVec" $ do
+    forM_ [0 .. 30] $ \n ->
+      forM_ [n .. 30] $ \m ->
+        let v = sumTotientVec (fromIntegral n) (fromIntegral m)
+         in forM_ [n .. m] $ \i ->
+              assertEqual (show (n, m, i)) (v ! (i - n)) (sumTotientNaive i)
+
 --
 -- Utilities
 --
@@ -58,6 +69,9 @@ numSquarefreeNaive n = genericLength (filter isSquarefreeNaive [1 .. n])
 
 sumSquarefreeNaive :: (Integral a) => a -> a
 sumSquarefreeNaive n = sum (filter isSquarefreeNaive [1 .. n])
+
+sumTotientNaive :: (Integral a) => a -> a
+sumTotientNaive n = sum (map totientNaive [1 .. n])
 
 totientNaive :: (Integral a) => a -> a
 totientNaive n = genericLength (filter (\x -> gcd n x == 1) [1 .. n])
