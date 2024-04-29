@@ -8,6 +8,7 @@ module SublinearSummation.Util
     primesFrom,
     primesVec,
     primePiVec,
+    primeSumVec,
     fromVectors,
   )
 where
@@ -69,6 +70,19 @@ primePiVec n =
             ++ repeat (genericLength xs)
       )
     & Vector.fromListN (fromIntegral n + 1)
+
+primeSumVec :: Word -> Vector Word
+primeSumVec n =
+  let psVec = primesVec 0 n
+      ps = Vector.toList psVec
+
+      go :: Word -> [Word] -> [Word]
+      go _ [] = repeat 0
+      go i (q : qs) =
+        if i == q
+          then q : go (i + 1) qs
+          else 0 : go (i + 1) (q : qs)
+   in Vector.fromListN (word2Int (n + 1)) (scanl1 (+) (go 0 ps))
 
 unitChimera :: UChimera ()
 unitChimera = Chimera.tabulate (const ())
