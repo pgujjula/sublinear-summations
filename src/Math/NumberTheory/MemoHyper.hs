@@ -87,7 +87,13 @@ import Math.NumberTheory.MemoHyper.Mutable qualified as MMemoHyper
 import Math.NumberTheory.Mobius (mertensVec, mobius')
 import Math.NumberTheory.Roots (integerRoot, integerSquareRoot)
 import Math.NumberTheory.Summation.Internal (numSquarefree, sumSquarefree, sumTotient)
-import SublinearSummation.Util (int2Word, primePiVec, primesVec, word2Int)
+import SublinearSummation.Util
+  ( int2Word,
+    primePiVec,
+    primeSumVec,
+    primesVec,
+    word2Int,
+  )
 
 -- | @'MemoHyper' v n b@ memoizes a function of the form
 --  \(x \mapsto f \left(\left\lfloor \frac{n}{x} \right\rfloor\right)\)
@@ -533,7 +539,89 @@ memoHyperPrimePhiST n = do
   freeze mh
 
 memoHyperRoughSum :: Word -> VMemoHyper (U.Vector Int)
-memoHyperRoughSum = todo
+memoHyperRoughSum n = runST (memoHyperRoughSumST n)
+
+memoHyperRoughSumST :: forall s. Word -> ST s (VMemoHyper (U.Vector Int))
+memoHyperRoughSumST n = do
+  let sq = integerSquareRoot n
+      ps = primesVec 0 sq
+      sumOfPrimes = G.scanl (+) 0 ps
+      ppi = primePiVec sq
+      pps = primeSumVec sq
+
+  mfv :: MV.MVector s (U.Vector Int) <- MV.replicate (word2Int sq) U.empty
+  mhv :: MV.MVector s (U.Vector Int) <- MV.replicate (word2Int sq) U.empty
+
+  forM_ [1 .. sq] $ \i -> do
+    let bMax = ppi ! word2Int (integerSquareRoot i)
+
+    (xs :: U.Vector Int) <-
+      U.generateM (word2Int bMax + 1) $ \b ->
+        let p = word2Int (ps ! (b - 1))
+         in if b == 0
+              then pure $ word2Int (i * (i + 1) `quot` 2)
+              else do
+                let i' = word2Int i
+                rv <- MV.read mfv ((i' `quot` p) - 1)
+                let iqp = i' `quot` p
+                    sq_iqp = integerSquareRoot iqp
+                    b_sq_iqp = word2Int $ ppi ! sq_iqp
+                    p_sum_iqp =
+                      (rv ! b_sq_iqp)
+                        + word2Int (pps ! sq_iqp)
+                        - 1
+                    x = word2Int $ sumOfPrimes ! (b - 1)
+
+                let fallback = p_sum_iqp - x + 1
+
+                let ans = fromMaybe fallback (rv !? (b - 1))
+                pure (-(p * ans))
+    let ys :: U.Vector Int
+        ys = G.scanl1 (+) xs
+    MV.write mfv (toIndex i) ys
+
+  forM_ [sq, sq - 1 .. 1] $ \i -> do
+    let nqi = n `quot` i
+    let bMax = ppi ! word2Int (integerSquareRoot nqi)
+    let sq' = word2Int sq
+    let n' = word2Int n
+    let nqi' = word2Int nqi
+
+    (xs :: U.Vector Int) <-
+      U.generateM (word2Int bMax + 1) $ \b ->
+        let p = word2Int (ps ! (b - 1))
+         in if b == 0
+              then pure $ word2Int (nqi * (nqi + 1) `quot` 2)
+              else do
+                let nqip' = nqi' `quot` p
+                rv <-
+                  if nqip' <= sq'
+                    then MV.read mfv (nqip' - 1)
+                    else MV.read mhv ((n' `quot` nqip') - 1)
+                let sq_nqip = integerSquareRoot nqip'
+                    b_sq_nqip = word2Int $ ppi ! sq_nqip
+                    p_sum_nqip =
+                      (rv ! b_sq_nqip)
+                        + word2Int (pps ! sq_nqip)
+                        - 1
+                    x = word2Int $ sumOfPrimes ! (b - 1)
+
+                let fallback = p_sum_nqip - x + 1
+
+                let ans = fromMaybe fallback (rv !? (b - 1))
+                pure (-(p * ans))
+    let ys :: U.Vector Int
+        ys = G.scanl1 (+) xs
+    MV.write mhv (toIndex i) ys
+
+  let mh =
+        MMemoHyper
+          { mmhLimit = n,
+            mmhSqrtLimit = sq,
+            mmhFuncVec = mfv,
+            mmhHyperVec = mhv
+          }
+  freeze mh
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.primeSum'.
 memoHyperPrimeSum :: (G.Vector v a, Integral a) => Word -> MemoHyper v a

@@ -25,7 +25,7 @@ import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (primes, word2Int)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
-import Test.Util (todoCode, todoTest)
+import Test.Util (todoTest)
 
 tests :: TestTree
 tests =
@@ -192,7 +192,7 @@ memoHyperPrimeSumTests = todoTest "memoHyperPrimeSum"
 
 memoHyperRoughSumTests :: TestTree
 memoHyperRoughSumTests =
-  todoCode . testCase "memoHyperRoughSum" $
+  testCase "memoHyperRoughSum" $
     forM_ [1 .. 1000] $ \n ->
       let mh :: VMemoHyper (U.Vector Int)
           mh = memoHyperRoughSum n
