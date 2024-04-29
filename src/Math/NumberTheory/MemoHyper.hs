@@ -71,7 +71,7 @@ import Data.Vector.Generic.Mutable (PrimMonad, PrimState)
 import Data.Vector.Mutable qualified as MV
 import Data.Vector.Unboxed qualified as U
 import Math.NumberTheory.HyperbolicConvolution
-import Math.NumberTheory.MemoHyper.Internal (numSquarefreeVec, sumSquarefreeVec)
+import Math.NumberTheory.MemoHyper.Internal (numSquarefreeVec, sumSquarefreeVec, sumTotientVec)
 import Math.NumberTheory.MemoHyper.Mutable
   ( MMemoHyper (..),
     UMMemoHyper,
@@ -85,7 +85,7 @@ import Math.NumberTheory.MemoHyper.Mutable
 import Math.NumberTheory.MemoHyper.Mutable qualified as MMemoHyper
 import Math.NumberTheory.Mobius (mertensVec, mobius')
 import Math.NumberTheory.Roots (integerRoot, integerSquareRoot)
-import Math.NumberTheory.Summation.Internal (numSquarefree, sumSquarefree)
+import Math.NumberTheory.Summation.Internal (numSquarefree, sumSquarefree, sumTotient)
 import SublinearSummation.Util (int2Word, primePiVec, primesVec, word2Int)
 
 -- | @'MemoHyper' v n b@ memoizes a function of the form
@@ -292,7 +292,21 @@ memoHyperSumSumDivisors = todo
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumTotient'.
 memoHyperSumTotient :: (Integral a, G.Vector v a) => Word -> MemoHyper v a
-memoHyperSumTotient = todo
+memoHyperSumTotient n =
+  let n23 :: Word
+      n23 = pow23 n
+
+      stvec :: U.Vector Int
+      stvec = sumTotientVec 0 n23
+
+      stotient :: Word -> Int
+      stotient t = stvec ! word2Int t
+   in memoHyperFixST n $ \_ i ->
+        let nqi = n `quot` i
+         in pure $
+              if nqi <= n23
+                then fromIntegral (stotient nqi)
+                else fromIntegral (sumTotient nqi)
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.numSquarefree'.
 memoHyperNumSquarefree :: (Integral a, G.Vector v a) => Word -> MemoHyper v a

@@ -13,6 +13,7 @@ import Math.NumberTheory.MemoHyper
     memoHyperNumSquarefree,
     memoHyperPrimePi,
     memoHyperSumSquarefree,
+    memoHyperSumTotient,
     unMemoHyper,
   )
 import Math.NumberTheory.Prime.Count (primePi)
@@ -101,8 +102,17 @@ memoHyperSumNumDivisorsBenchmarks = todoBenchmark "memoHyperSumNumDivisors"
 memoHyperSumSumDivisorsBenchmarks :: Benchmark
 memoHyperSumSumDivisorsBenchmarks = todoBenchmark "memoHyperSumSumDivisors"
 
+-- TODO: This benchmark runs out of memory for 10^7, 10^8, which shouldn't
+-- happen.
 memoHyperSumTotientBenchmarks :: Benchmark
-memoHyperSumTotientBenchmarks = todoBenchmark "memoHyperSumTotient"
+memoHyperSumTotientBenchmarks =
+  bgroup "memoHyperSumTotient" $ flip map [(1 :: Int) .. 8] $ \i ->
+    bench ("10^" ++ show i) $
+      nf
+        ( collectMemoHyper
+            . (memoHyperSumTotient :: Word -> UMemoHyper Int)
+        )
+        (10 ^ i)
 
 -- Primes
 

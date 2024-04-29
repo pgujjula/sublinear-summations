@@ -17,6 +17,7 @@ import Math.NumberTheory.MemoHyper
     memoHyperPrimePhi,
     memoHyperPrimePi,
     memoHyperSumSquarefree,
+    memoHyperSumTotient,
   )
 import Math.NumberTheory.Prime.Count (primePhi, primePi)
 import Math.NumberTheory.Roots (integerSquareRoot)
@@ -107,7 +108,28 @@ memoHyperSumSumDivisorsTests :: TestTree
 memoHyperSumSumDivisorsTests = todoTest "memoHyperSumSumDivisors"
 
 memoHyperSumTotientTests :: TestTree
-memoHyperSumTotientTests = todoTest "memoHyperSumTotient"
+memoHyperSumTotientTests =
+  testCase "memoHyperSumTotient" $
+    forM_ [1 .. 100] $ \n ->
+      let mh :: UMemoHyper Int
+          mh = memoHyperSumTotient n
+
+          mhNaive :: UMemoHyper Int
+          mhNaive =
+            let sq = integerSquareRoot n
+             in MemoHyper
+                  { mhLimit = n,
+                    mhSqrtLimit = integerSquareRoot n,
+                    mhFuncVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map (sumTotientNaive . fromIntegral) [1 .. sq],
+                    mhHyperVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map
+                          (sumTotientNaive . fromIntegral . (n `quot`))
+                          [1 .. sq]
+                  }
+       in mh @?= mhNaive
 
 -- Primes
 
@@ -296,3 +318,12 @@ mobiusNaive n =
        in if even (length primeDivisors)
             then 1
             else -1
+
+relativelyPrime :: (Integral a) => a -> a -> Bool
+relativelyPrime a b = gcd a b == 1
+
+totientNaive :: (Integral a) => a -> a
+totientNaive n = genericLength (filter (relativelyPrime n) [1 .. n])
+
+sumTotientNaive :: (Integral a) => a -> a
+sumTotientNaive n = sum (map totientNaive [1 .. n])
