@@ -30,8 +30,7 @@ tests =
         ],
       testGroup
         "Primes"
-        [ primePiTests,
-          primeSumTests
+        [ primeSumTests
         ],
       testGroup
         "Square-free integers"
@@ -89,9 +88,6 @@ sumTotientTests =
 --
 -- Primes
 --
-
-primePiTests :: TestTree
-primePiTests = todoTest "primePi"
 
 primeSumTests :: TestTree
 primeSumTests = todoTest "primeSum"

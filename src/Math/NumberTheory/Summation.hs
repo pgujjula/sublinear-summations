@@ -13,7 +13,6 @@ module Math.NumberTheory.Summation
     sumTotient,
 
     -- * Primes
-    primePi,
     primeSum,
 
     -- * Square-free integers
@@ -72,10 +71,6 @@ sumSumDivisors n =
 --
 -- Primes
 --
-
--- | @'primePi' n@ is the number of primes ≤ @n@.
-primePi :: (Integral a) => a -> a
-primePi = todo
 
 -- | @'primeSum' n@ is the sum of the primes ≤ @n@.
 primeSum :: (Integral a) => a -> a

@@ -26,8 +26,7 @@ benchmarks =
         ],
       bgroup
         "Primes"
-        [ primePiBenchmarks,
-          primeSumBenchmarks
+        [ primeSumBenchmarks
         ],
       bgroup
         "Square-free integers"
@@ -62,9 +61,6 @@ sumTotientBenchmarks =
 --
 -- Primes
 --
-
-primePiBenchmarks :: Benchmark
-primePiBenchmarks = todoBenchmark "primePi"
 
 primeSumBenchmarks :: Benchmark
 primeSumBenchmarks = todoBenchmark "primeSum"
