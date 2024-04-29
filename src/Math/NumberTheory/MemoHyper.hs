@@ -47,6 +47,7 @@ module Math.NumberTheory.MemoHyper
     memoHyperPrimePi,
     memoHyperPrimeSum,
     memoHyperPrimePhi,
+    memoHyperRoughSum,
 
     -- ** Square-free integers
     memoHyperMertens,
@@ -530,6 +531,9 @@ memoHyperPrimePhiST n = do
             mmhHyperVec = mhv
           }
   freeze mh
+
+memoHyperRoughSum :: Word -> VMemoHyper (U.Vector Int)
+memoHyperRoughSum = todo
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.primeSum'.
 memoHyperPrimeSum :: (G.Vector v a, Integral a) => Word -> MemoHyper v a
