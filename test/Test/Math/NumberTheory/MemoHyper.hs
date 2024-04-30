@@ -21,7 +21,9 @@ import Math.NumberTheory.MemoHyper
     memoHyperRoughSum,
     memoHyperSigmaHyper,
     memoHyperSigmaMobiusHyper,
+    memoHyperSumNumDivisors,
     memoHyperSumSquarefree,
+    memoHyperSumSumDivisors,
     memoHyperSumTotient,
   )
 import Math.NumberTheory.Mobius (mobius')
@@ -30,7 +32,7 @@ import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (primes, word2Int)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase, (@?=))
-import Test.Util (todoTest)
+import Test.Util (todoCode, todoTest)
 
 tests :: TestTree
 tests =
@@ -133,10 +135,52 @@ memoHyperSigmaMobiusHyperTests =
 -- Divisor functions
 
 memoHyperSumNumDivisorsTests :: TestTree
-memoHyperSumNumDivisorsTests = todoTest "memoHyperSumNumDivisors"
+memoHyperSumNumDivisorsTests =
+  todoCode . testCase "memoHyperSumNumDivisors" $
+    forM_ [1 .. 100] $ \n ->
+      let mh :: UMemoHyper Int
+          mh = memoHyperSumNumDivisors n
+
+          mhNaive :: UMemoHyper Int
+          mhNaive =
+            let sq = integerSquareRoot n
+             in MemoHyper
+                  { mhLimit = n,
+                    mhSqrtLimit = integerSquareRoot n,
+                    mhFuncVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map (sumNumDivisorsNaive . fromIntegral) [1 .. sq],
+                    mhHyperVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map
+                          (sumNumDivisorsNaive . fromIntegral . (n `quot`))
+                          [1 .. sq]
+                  }
+       in mh @?= mhNaive
 
 memoHyperSumSumDivisorsTests :: TestTree
-memoHyperSumSumDivisorsTests = todoTest "memoHyperSumSumDivisors"
+memoHyperSumSumDivisorsTests =
+  todoCode . testCase "memoHyperSumSumDivisors" $
+    forM_ [1 .. 100] $ \n ->
+      let mh :: UMemoHyper Int
+          mh = memoHyperSumSumDivisors n
+
+          mhNaive :: UMemoHyper Int
+          mhNaive =
+            let sq = integerSquareRoot n
+             in MemoHyper
+                  { mhLimit = n,
+                    mhSqrtLimit = integerSquareRoot n,
+                    mhFuncVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map (sumSumDivisorsNaive . fromIntegral) [1 .. sq],
+                    mhHyperVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map
+                          (sumSumDivisorsNaive . fromIntegral . (n `quot`))
+                          [1 .. sq]
+                  }
+       in mh @?= mhNaive
 
 memoHyperSumTotientTests :: TestTree
 memoHyperSumTotientTests =
@@ -366,6 +410,18 @@ memoHyperIntegerSquareRootTests =
 --
 -- Utilities
 --
+
+sumNumDivisorsNaive :: (Integral a) => a -> a
+sumNumDivisorsNaive n = sum (map numDivisorsNaive [1 .. n])
+
+sumSumDivisorsNaive :: (Integral a) => a -> a
+sumSumDivisorsNaive n = sum (map sumDivisorsNaive [1 .. n])
+
+numDivisorsNaive :: (Integral a) => a -> a
+numDivisorsNaive n = genericLength (filter (`divides` n) [1 .. n])
+
+sumDivisorsNaive :: (Integral a) => a -> a
+sumDivisorsNaive n = sum (filter (`divides` n) [1 .. n])
 
 primeSumNaive :: (Integral a) => a -> a
 primeSumNaive n = sum (filter isPrimeNaive [1 .. n])
