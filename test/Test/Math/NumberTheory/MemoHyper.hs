@@ -7,11 +7,13 @@ import Control.Monad (forM_)
 import Data.List (genericLength, genericTake)
 import Data.Vector.Generic qualified as Vector
 import Data.Vector.Unboxed qualified as U
+import Math.NumberTheory.HyperbolicConvolution (hyperConvolve, sigma)
 import Math.NumberTheory.MemoHyper
   ( MemoHyper (..),
     UMemoHyper,
     VMemoHyper,
     memoHyper,
+    memoHyperHyperConvolve,
     memoHyperIntegerSquareRoot,
     memoHyperMertens,
     memoHyperNumSquarefree,
@@ -48,7 +50,8 @@ tests =
         [ memoHyperTests,
           memoHyperDirectTests,
           memoHyperSigmaHyperTests,
-          memoHyperSigmaMobiusHyperTests
+          memoHyperSigmaMobiusHyperTests,
+          memoHyperHyperConvolveTests
         ],
       testGroup
         "MemoHyper for arithmetic functions"
@@ -127,6 +130,32 @@ memoHyperSigmaMobiusHyperTests =
             mhNaive :: UMemoHyper Int
             mhNaive = memoHyper g n
          in assertEqual (show (n, fName)) mhNaive mh
+
+memoHyperHyperConvolveTests :: TestTree
+memoHyperHyperConvolveTests =
+  todoCode . testCase "memoHyperHyperConvolve" $
+    forM_ [1 .. 1000] $ \n -> do
+      forM_
+        [ ("mobius", mobius', const 1),
+          ("mobius n * n", \x -> mobius' x * fromIntegral x, fromIntegral)
+        ]
+        $ \(fName, f, fInv :: Word -> Int) ->
+          forM_
+            [ ("const 1", const 1),
+              ("2*", fromIntegral . (2 *))
+            ]
+            $ \(gName, g :: Word -> Int) -> do
+              let h = hyperConvolve f g
+              let mhNaive :: UMemoHyper Int
+                  mhNaive = memoHyper h n
+                  mh :: UMemoHyper Int
+                  mh =
+                    memoHyperHyperConvolve
+                      (memoHyper (sigma fInv) n :: UMemoHyper Int)
+                      g
+                      (map h [1 ..])
+                      n
+              assertEqual (show (fName, gName, n)) mhNaive mh
 
 --
 -- MemoHyper for arithmetic functions

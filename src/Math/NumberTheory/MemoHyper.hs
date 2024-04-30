@@ -28,6 +28,7 @@ module Math.NumberTheory.MemoHyper
     memoHyperDirect,
     memoHyperSigmaHyper,
     memoHyperSigmaMobiusHyper,
+    memoHyperHyperConvolve,
 
     -- * Conversion
     freeze,
@@ -333,6 +334,22 @@ getIndices xs = go xs 0
         then y : go is (j + 1) ys
         else go (i : is) (j + 1) ys
     go _ _ _ = error "memoHyperSigmaMobiusHyper: oops"
+
+-- | Given \(f, g : \mathbb{N}^{+} \to \mathbf{B}\), define
+-- \[h(n) = \sum_{i=1}^{n}
+--     f(i) g\left(\left\lfloor \frac{n}{i} \right\rfloor\right)\]
+-- This function memoizes
+-- \(x \mapsto h \left(\left\lfloor \frac{n}{x} \right\rfloor\right)\),
+-- when provided a 'MemoHyper' for the 'sigma' of the Dirichlet inverse of @f@, an
+-- implementation of @g@, and a list of small values of @h@.
+memoHyperHyperConvolve ::
+  (G.Vector u b, G.Vector v b, Integral b) =>
+  MemoHyper u b ->
+  (Word -> b) ->
+  [b] ->
+  Word ->
+  MemoHyper v b
+memoHyperHyperConvolve = todo
 
 -- | Convert a 'MMemoHyper' to 'MemoHyper' by copying.
 freeze ::
