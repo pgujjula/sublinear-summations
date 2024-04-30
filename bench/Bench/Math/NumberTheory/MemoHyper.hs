@@ -12,6 +12,7 @@ import Math.NumberTheory.MemoHyper
     memoHyperMertens,
     memoHyperNumSquarefree,
     memoHyperPrimePi,
+    memoHyperPrimeSum,
     memoHyperSumSquarefree,
     memoHyperSumTotient,
     unMemoHyper,
@@ -150,7 +151,12 @@ memoHyperPrimePiNaive n =
         }
 
 memoHyperPrimeSumBenchmarks :: Benchmark
-memoHyperPrimeSumBenchmarks = todoBenchmark "memoHyperPrimeSum"
+memoHyperPrimeSumBenchmarks =
+  bgroup "memoHyperPrimeSum" $ flip map [(1 :: Int) .. 10] $ \i ->
+    bench ("10^" ++ show i) $
+      nf
+        (collectMemoHyper . memoHyperPrimeSum)
+        (10 ^ i)
 
 -- Square-free integers
 
