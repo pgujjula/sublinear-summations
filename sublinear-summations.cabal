@@ -54,7 +54,6 @@ library
     , data-ordlist
     , infinite-list
     , integer-roots
-    , placeholder
     , primesieve
     , vector
   default-language: GHC2021

@@ -62,9 +62,10 @@ where
 
 import Control.Monad (forM, forM_)
 import Control.Monad.ST (ST, runST)
-import Control.Placeholder (todo)
+import Data.Chimera qualified as Chimera
 import Data.Function ((&))
 import Data.List (genericReplicate)
+import Data.List.Infinite qualified as Infinite
 import Data.Maybe (fromMaybe)
 import Data.Vector qualified as V
 import Data.Vector.Generic (Mutable, unsafeIndex, (!), (!?))
@@ -76,6 +77,7 @@ import Math.NumberTheory.HyperbolicConvolution
 import Math.NumberTheory.MemoHyper.Internal
   ( numDivisorsVec,
     numSquarefreeVec,
+    sumDivisorsVec,
     sumSquarefreeVec,
     sumTotientVec,
   )
@@ -94,7 +96,7 @@ import Math.NumberTheory.MemoHyper.Mutable
     writeSmall,
   )
 import Math.NumberTheory.MemoHyper.Mutable qualified as MMemoHyper
-import Math.NumberTheory.Mobius (mertensVec, mobius')
+import Math.NumberTheory.Mobius (mertensVec, mobius', mobiusChimera)
 import Math.NumberTheory.Roots (integerRoot, integerSquareRoot)
 import Math.NumberTheory.Summation.Internal (numSquarefree, sumSquarefree, sumTotient)
 import SublinearSummation.Util
@@ -536,8 +538,29 @@ memoHyperSumNumDivisors n =
    in memoHyperSigmaHyper fromIntegral sumNumDivisorsList n
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumSumDivisors'.
-memoHyperSumSumDivisors :: (Integral a, G.Vector v a) => Word -> MemoHyper v a
-memoHyperSumSumDivisors = todo
+memoHyperSumSumDivisors :: forall v a. (Integral a, G.Vector v a) => Word -> MemoHyper v a
+memoHyperSumSumDivisors n =
+  let xs :: [a]
+      xs =
+        Chimera.toInfinite mobiusChimera
+          & Infinite.tail
+          & Infinite.toList
+          & zipWith (*) [1 ..]
+          & map fromIntegral
+          & scanl1 (+)
+
+      mhSigmaFInv :: VMemoHyper a
+      mhSigmaFInv =
+        memoHyperHyperConvolve
+          (memoHyper (sigma fromIntegral) n :: VMemoHyper a)
+          (const 1)
+          xs
+          n
+
+      sumSumDivisorsList :: [a]
+      sumSumDivisorsList =
+        map fromIntegral (G.toList (G.scanl1 (+) (sumDivisorsVec 1 n)))
+   in memoHyperHyperConvolve mhSigmaFInv fromIntegral sumSumDivisorsList n
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumTotient'.
 memoHyperSumTotient :: (Integral a, G.Vector v a) => Word -> MemoHyper v a

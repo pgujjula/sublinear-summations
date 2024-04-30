@@ -48,7 +48,6 @@ library:
   - data-ordlist
   - infinite-list
   - integer-roots
-  - placeholder
   - primesieve
   - vector
 

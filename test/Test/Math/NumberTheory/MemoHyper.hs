@@ -34,7 +34,7 @@ import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (primes, word2Int)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase, (@?=))
-import Test.Util (todoCode, todoTest)
+import Test.Util (todoTest)
 
 tests :: TestTree
 tests =
@@ -189,7 +189,7 @@ memoHyperSumNumDivisorsTests =
 
 memoHyperSumSumDivisorsTests :: TestTree
 memoHyperSumSumDivisorsTests =
-  todoCode . testCase "memoHyperSumSumDivisors" $
+  testCase "memoHyperSumSumDivisors" $
     forM_ [1 .. 100] $ \n ->
       let mh :: UMemoHyper Int
           mh = memoHyperSumSumDivisors n
