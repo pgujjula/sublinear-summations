@@ -22,12 +22,12 @@ module Math.NumberTheory.Summation
   )
 where
 
-import Control.Placeholder (todo)
 import Data.Bits (shiftR)
 import Math.NumberTheory.HyperbolicConvolution (hyperConvolveFast)
 import Math.NumberTheory.MemoHyper
   ( UMemoHyper,
     memoHyperMertens,
+    memoHyperPrimeSum,
     unMemoHyper,
   )
 import Math.NumberTheory.Summation.Internal
@@ -74,7 +74,7 @@ sumSumDivisors n =
 
 -- | @'primeSum' n@ is the sum of the primes ≤ @n@.
 primeSum :: (Integral a) => a -> a
-primeSum = todo
+primeSum = fromIntegral . flip unMemoHyper 1 . memoHyperPrimeSum . fromIntegral
 
 --
 -- Square-free integers

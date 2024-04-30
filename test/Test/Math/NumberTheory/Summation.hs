@@ -8,6 +8,7 @@ import Data.List (genericLength)
 import Math.NumberTheory.Summation
   ( mertens,
     numSquarefree,
+    primeSum,
     sumNumDivisors,
     sumSquarefree,
     sumSumDivisors,
@@ -16,7 +17,6 @@ import Math.NumberTheory.Summation
 import SublinearSummation.Util (primes)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertEqual, testCase)
-import Test.Util (todoTest)
 
 tests :: TestTree
 tests =
@@ -90,7 +90,16 @@ sumTotientTests =
 --
 
 primeSumTests :: TestTree
-primeSumTests = todoTest "primeSum"
+primeSumTests =
+  testCase "primeSum" $ do
+    forM_ [(1 :: Word) .. 100] $ \n ->
+      assertEqual (show n) (primeSumNaive n) (primeSum n)
+
+primeSumNaive :: (Integral a) => a -> a
+primeSumNaive n = sum (filter isPrimeNaive [1 .. n])
+
+isPrimeNaive :: (Integral a) => a -> Bool
+isPrimeNaive n = length (filter (`divides` n) [1 .. n]) == 2
 
 --
 -- Square-free integers
