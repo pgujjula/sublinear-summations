@@ -133,7 +133,7 @@ memoHyperSigmaMobiusHyperTests =
 
 memoHyperHyperConvolveTests :: TestTree
 memoHyperHyperConvolveTests =
-  todoCode . testCase "memoHyperHyperConvolve" $
+  testCase "memoHyperHyperConvolve" $
     forM_ [1 .. 1000] $ \n -> do
       forM_
         [ ("mobius", mobius', const 1),

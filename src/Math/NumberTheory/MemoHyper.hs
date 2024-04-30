@@ -349,7 +349,91 @@ memoHyperHyperConvolve ::
   [b] ->
   Word ->
   MemoHyper v b
-memoHyperHyperConvolve = todo
+memoHyperHyperConvolve mhSigmaFInv g hVals n =
+  runST (memoHyperHyperConvolveST mhSigmaFInv g hVals n)
+
+memoHyperHyperConvolveST ::
+  forall u v s b.
+  (G.Vector u b, G.Vector v b, Integral b) =>
+  MemoHyper u b ->
+  (Word -> b) ->
+  [b] ->
+  Word ->
+  ST s (MemoHyper v b)
+memoHyperHyperConvolveST mhSigmaFInv g hVals n = do
+  let n23 :: Word
+      n23 = pow23 n
+
+      sq :: Word
+      sq = integerSquareRoot n
+
+  mmh <- MMemoHyper.new n
+  let fillLower :: [b] -> ST s ()
+      fillLower vs = do
+        let lowerVals = take (word2Int sq) vs
+        forM_ (zip [1 ..] lowerVals) (uncurry (writeSmall mmh))
+
+      fillUpper :: [b] -> ST s ()
+      fillUpper vs = do
+        let indices =
+              map (\x -> x - 1) $
+                takeWhile (<= n23) $
+                  map (n `quot`) [sq, sq - 1 .. 1]
+        forM_
+          (zip [sq, sq - 1 .. 1] (getIndices (map word2Int indices) vs))
+          (uncurry (writeHyper mmh))
+
+      calc :: Word -> ST s b
+      calc i = do
+        let hyperHPatched :: Word -> ST s b
+            hyperHPatched j =
+              if j == 1
+                then pure 0
+                else readHyper mmh (i * j)
+
+            hM :: Word -> ST s b
+            hM = readSmall mmh
+
+            diff_hM :: Word -> ST s b
+            diff_hM = diffM hM
+
+            sigmaFInv :: Word -> b
+            sigmaFInv = unMemoSmall mhSigmaFInv
+
+            fInv :: Word -> b
+            fInv = diff sigmaFInv
+
+            fInvM :: Word -> ST s b
+            fInvM = pure . fInv
+
+            hyperSigmaFInv :: Word -> b
+            hyperSigmaFInv j = unMemoHyper mhSigmaFInv (i * j)
+
+            hyperSigmaFInvM :: Word -> ST s b
+            hyperSigmaFInvM = pure . hyperSigmaFInv
+
+        let nqi = n `quot` i
+
+        (conv :: b) <-
+          hyperConvolveFastM
+            fInvM
+            hyperSigmaFInvM
+            diff_hM
+            hyperHPatched
+            nqi
+        let fInv1 = unMemoHyper mhSigmaFInv n
+        pure $
+          (g nqi - conv)
+            `quot` fInv1
+
+  fillLower hVals
+  fillUpper hVals
+  let is = dropWhile (\i -> n `quot` i <= n23) [sq, sq - 1 .. 1]
+  forM_ is $ \i -> do
+    x <- calc i
+    writeHyper mmh i x
+
+  freeze mmh
 
 -- | Convert a 'MMemoHyper' to 'MemoHyper' by copying.
 freeze ::
