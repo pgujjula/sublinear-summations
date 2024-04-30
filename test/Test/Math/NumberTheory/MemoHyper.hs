@@ -19,6 +19,7 @@ import Math.NumberTheory.MemoHyper
     memoHyperPrimePi,
     memoHyperPrimeSum,
     memoHyperRoughSum,
+    memoHyperSigmaHyper,
     memoHyperSigmaMobiusHyper,
     memoHyperSumSquarefree,
     memoHyperSumTotient,
@@ -96,7 +97,19 @@ memoHyperDirectTests :: TestTree
 memoHyperDirectTests = todoTest "memoHyperDirect"
 
 memoHyperSigmaHyperTests :: TestTree
-memoHyperSigmaHyperTests = todoTest "memoHyperSigmaHyper"
+memoHyperSigmaHyperTests =
+  testCase "memoHyperSigmaHyper" $
+    forM_ [1000 .. 1000] $ \n -> do
+      forM_ [("const 1", const 1), ("id", word2Int), ("(2*", (2 *) . word2Int)] $ \(fName, f) -> do
+        let g :: Word -> Int
+            g m = sum (flip map [1 .. m] $ \i -> f (m `quot` i))
+
+            mh :: UMemoHyper Int
+            mh = memoHyperSigmaHyper f (map g [1 ..]) n
+
+            mhNaive :: UMemoHyper Int
+            mhNaive = memoHyper g n
+         in assertEqual (show (n, fName)) mhNaive mh
 
 memoHyperSigmaMobiusHyperTests :: TestTree
 memoHyperSigmaMobiusHyperTests =

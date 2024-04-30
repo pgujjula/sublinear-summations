@@ -188,7 +188,67 @@ memoHyperDirect fh n =
 -- small values of @g@.
 memoHyperSigmaHyper ::
   (G.Vector v b, Integral b) => (Word -> b) -> [b] -> Word -> MemoHyper v b
-memoHyperSigmaHyper = todo
+memoHyperSigmaHyper f vals n = runST (memoHyperSigmaHyperST f vals n)
+
+memoHyperSigmaHyperST ::
+  forall v s b. (G.Vector v b, Integral b) => (Word -> b) -> [b] -> Word -> ST s (MemoHyper v b)
+memoHyperSigmaHyperST f vals n = do
+  let n23 :: Word
+      n23 = pow23 n
+
+      sq :: Word
+      sq = integerSquareRoot n
+
+      mertH :: MemoHyper v b
+      mertH = memoHyperMertens n
+
+  mmh <- MMemoHyper.new n
+  let fillLower :: [b] -> ST s ()
+      fillLower vs = do
+        let lowerVals = take (word2Int sq) vs
+        forM_ (zip [1 ..] lowerVals) (uncurry (writeSmall mmh))
+
+      fillUpper :: [b] -> ST s ()
+      fillUpper vs = do
+        let indices =
+              map (\x -> x - 1) $
+                takeWhile (<= n23) $
+                  map (n `quot`) [sq, sq - 1 .. 1]
+        forM_
+          (zip [sq, sq - 1 .. 1] (getIndices (map word2Int indices) vs))
+          (uncurry (writeHyper mmh))
+
+      calc :: Word -> ST s b
+      calc i = do
+        let k :: Word -> ST s b
+            k j =
+              if j == 1
+                then pure 0
+                else readHyper mmh (i * j)
+
+            gM :: Word -> ST s b
+            gM = readSmall mmh
+
+            diff_gM :: Word -> ST s b
+            diff_gM = diffM gM
+
+        (gsum :: b) <-
+          hyperConvolveFastM
+            (pure . fromIntegral . mobius')
+            (pure . unMemoHyper mertH . (* i))
+            diff_gM
+            k
+            (n `quot` i)
+        pure (f (n `quot` i) - gsum)
+
+  fillLower vals
+  fillUpper vals
+  let is = dropWhile (\i -> n `quot` i <= n23) [sq, sq - 1 .. 1]
+  forM_ is $ \i -> do
+    x <- calc i
+    writeHyper mmh i x
+
+  freeze mmh
 
 -- | Given \(f : \mathbb{N}^{+} \to \mathbf{B}\), define
 -- \[g(n) = \sum_{i=1}^{n}
