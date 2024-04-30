@@ -11,6 +11,7 @@ import Math.NumberTheory.MemoHyper
   ( MemoHyper (..),
     UMemoHyper,
     VMemoHyper,
+    memoHyper,
     memoHyperIntegerSquareRoot,
     memoHyperMertens,
     memoHyperNumSquarefree,
@@ -18,14 +19,16 @@ import Math.NumberTheory.MemoHyper
     memoHyperPrimePi,
     memoHyperPrimeSum,
     memoHyperRoughSum,
+    memoHyperSigmaMobiusHyper,
     memoHyperSumSquarefree,
     memoHyperSumTotient,
   )
+import Math.NumberTheory.Mobius (mobius')
 import Math.NumberTheory.Prime.Count (primePhi, primePi)
 import Math.NumberTheory.Roots (integerSquareRoot)
 import SublinearSummation.Util (primes, word2Int)
 import Test.Tasty (TestTree, testGroup)
-import Test.Tasty.HUnit (testCase, (@?=))
+import Test.Tasty.HUnit (assertEqual, testCase, (@?=))
 import Test.Util (todoTest)
 
 tests :: TestTree
@@ -96,7 +99,19 @@ memoHyperSigmaHyperTests :: TestTree
 memoHyperSigmaHyperTests = todoTest "memoHyperSigmaHyper"
 
 memoHyperSigmaMobiusHyperTests :: TestTree
-memoHyperSigmaMobiusHyperTests = todoTest "memoHyperSigmaMobiusHyper"
+memoHyperSigmaMobiusHyperTests =
+  testCase "memoHyperSigmaMobiusHyper" $
+    forM_ [1 .. 1000] $ \n -> do
+      forM_ [("const 1", const 1), ("id", word2Int), ("(2*", (2 *) . word2Int)] $ \(fName, f) -> do
+        let g :: Word -> Int
+            g m = sum (flip map [1 .. m] $ \i -> mobius' i * f (m `quot` i))
+
+            mh :: UMemoHyper Int
+            mh = memoHyperSigmaMobiusHyper f (map g [1 ..]) n
+
+            mhNaive :: UMemoHyper Int
+            mhNaive = memoHyper g n
+         in assertEqual (show (n, fName)) mhNaive mh
 
 --
 -- MemoHyper for arithmetic functions

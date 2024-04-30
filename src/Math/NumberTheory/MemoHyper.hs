@@ -76,12 +76,16 @@ import Math.NumberTheory.MemoHyper.Internal (numSquarefreeVec, sumSquarefreeVec,
 import Math.NumberTheory.MemoHyper.Mutable
   ( MMemoHyper (..),
     UMMemoHyper,
+    readHyper,
+    readSmall,
     unsafeModifyHyper,
     unsafeModifySmall,
     unsafeReadHyper,
     unsafeReadSmall,
     unsafeWriteHyper,
     unsafeWriteSmall,
+    writeHyper,
+    writeSmall,
   )
 import Math.NumberTheory.MemoHyper.Mutable qualified as MMemoHyper
 import Math.NumberTheory.Mobius (mertensVec, mobius')
@@ -194,7 +198,76 @@ memoHyperSigmaHyper = todo
 -- when provided @f@, and a list of small values of @g@.
 memoHyperSigmaMobiusHyper ::
   (G.Vector v b, Integral b) => (Word -> b) -> [b] -> Word -> MemoHyper v b
-memoHyperSigmaMobiusHyper = todo
+memoHyperSigmaMobiusHyper f vals n = runST (memoHyperSigmaMobiusHyperST f vals n)
+
+memoHyperSigmaMobiusHyperST ::
+  forall v s b. (G.Vector v b, Integral b) => (Word -> b) -> [b] -> Word -> ST s (MemoHyper v b)
+memoHyperSigmaMobiusHyperST f vals n = do
+  let n23 :: Word
+      n23 = pow23 n
+
+      sq :: Word
+      sq = integerSquareRoot n
+
+  mmh <- MMemoHyper.new n
+  let fillLower :: [b] -> ST s ()
+      fillLower vs = do
+        let lowerVals = take (word2Int sq) vs
+        forM_ (zip [1 ..] lowerVals) (uncurry (writeSmall mmh))
+
+      fillUpper :: [b] -> ST s ()
+      fillUpper vs = do
+        let indices =
+              map (\x -> x - 1) $
+                takeWhile (<= n23) $
+                  map (n `quot`) [sq, sq - 1 .. 1]
+        forM_
+          (zip [sq, sq - 1 .. 1] (getIndices (map word2Int indices) vs))
+          (uncurry (writeHyper mmh))
+
+      calc :: Word -> ST s b
+      calc i = do
+        let k :: Word -> ST s b
+            k j =
+              if j == 1
+                then pure 0
+                else readHyper mmh (i * j)
+
+            gM :: Word -> ST s b
+            gM = readSmall mmh
+
+            diff_gM :: Word -> ST s b
+            diff_gM = diffM gM
+        let nqi = n `quot` i
+
+        (gsum :: b) <-
+          hyperConvolveFastM
+            (const (pure 1))
+            (pure . fromIntegral . (nqi `quot`))
+            diff_gM
+            k
+            (n `quot` i)
+        pure (f (n `quot` i) - gsum)
+
+  fillLower vals
+  fillUpper vals
+  let is = dropWhile (\i -> n `quot` i <= n23) [sq, sq - 1 .. 1]
+  forM_ is $ \i -> do
+    x <- calc i
+    writeHyper mmh i x
+
+  freeze mmh
+
+getIndices :: [Int] -> [a] -> [a]
+getIndices xs = go xs 0
+  where
+    go :: [Int] -> Int -> [a] -> [a]
+    go [] _ _ = []
+    go (i : is) j (y : ys) =
+      if i == j
+        then y : go is (j + 1) ys
+        else go (i : is) (j + 1) ys
+    go _ _ _ = error "memoHyperSigmaMobiusHyper: oops"
 
 -- | Convert a 'MMemoHyper' to 'MemoHyper' by copying.
 freeze ::
