@@ -7,7 +7,9 @@ import Control.Monad (forM_)
 import Data.List (genericLength)
 import Data.Vector.Generic ((!))
 import Math.NumberTheory.MemoHyper.Internal
-  ( numSquarefreeVec,
+  ( numDivisorsVec,
+    numSquarefreeVec,
+    sumDivisorsVec,
     sumSquarefreeVec,
     sumTotientVec,
     totientVec,
@@ -19,11 +21,31 @@ tests :: TestTree
 tests =
   testGroup
     "Math.NumberTheory.MemoHyper.Internal"
-    [ numSquarefreeVecTests,
+    [ numDivisorsVecTests,
+      sumDivisorsVecTests,
+      numSquarefreeVecTests,
       sumSquarefreeVecTests,
       totientVecTests,
       sumTotientVecTests
     ]
+
+numDivisorsVecTests :: TestTree
+numDivisorsVecTests =
+  testCase "numDivisorsVec" $ do
+    forM_ [1 .. 30] $ \n ->
+      forM_ [n .. 30] $ \m ->
+        let v = numDivisorsVec (fromIntegral n) (fromIntegral m)
+         in forM_ [n .. m] $ \i ->
+              assertEqual (show (n, m, i)) (v ! (i - n)) (numDivisorsNaive i)
+
+sumDivisorsVecTests :: TestTree
+sumDivisorsVecTests =
+  testCase "sumDivisorsVec" $ do
+    forM_ [1 .. 30] $ \n ->
+      forM_ [n .. 30] $ \m ->
+        let v = sumDivisorsVec (fromIntegral n) (fromIntegral m)
+         in forM_ [n .. m] $ \i ->
+              assertEqual (show i) (v ! (i - n)) (sumDivisorsNaive i)
 
 numSquarefreeVecTests :: TestTree
 numSquarefreeVecTests =
@@ -64,6 +86,12 @@ sumTotientVecTests =
 --
 -- Utilities
 --
+numDivisorsNaive :: (Integral a) => a -> a
+numDivisorsNaive n = genericLength (filter (`divides` n) [1 .. n])
+
+sumDivisorsNaive :: (Integral a) => a -> a
+sumDivisorsNaive n = sum (filter (`divides` n) [1 .. n])
+
 numSquarefreeNaive :: (Integral a) => a -> a
 numSquarefreeNaive n = genericLength (filter isSquarefreeNaive [1 .. n])
 
