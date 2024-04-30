@@ -72,7 +72,12 @@ import Data.Vector.Generic.Mutable (PrimMonad, PrimState)
 import Data.Vector.Mutable qualified as MV
 import Data.Vector.Unboxed qualified as U
 import Math.NumberTheory.HyperbolicConvolution
-import Math.NumberTheory.MemoHyper.Internal (numSquarefreeVec, sumSquarefreeVec, sumTotientVec)
+import Math.NumberTheory.MemoHyper.Internal
+  ( numDivisorsVec,
+    numSquarefreeVec,
+    sumSquarefreeVec,
+    sumTotientVec,
+  )
 import Math.NumberTheory.MemoHyper.Mutable
   ( MMemoHyper (..),
     UMMemoHyper,
@@ -424,7 +429,10 @@ memoHyperMertens n =
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumNumDivisors'.
 memoHyperSumNumDivisors :: (Integral a, G.Vector v a) => Word -> MemoHyper v a
-memoHyperSumNumDivisors = todo
+memoHyperSumNumDivisors n =
+  let sumNumDivisorsList =
+        map fromIntegral (G.toList (G.scanl1 (+) (numDivisorsVec 1 n)))
+   in memoHyperSigmaHyper fromIntegral sumNumDivisorsList n
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumSumDivisors'.
 memoHyperSumSumDivisors :: (Integral a, G.Vector v a) => Word -> MemoHyper v a

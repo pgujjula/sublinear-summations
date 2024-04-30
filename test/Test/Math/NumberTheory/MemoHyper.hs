@@ -136,7 +136,7 @@ memoHyperSigmaMobiusHyperTests =
 
 memoHyperSumNumDivisorsTests :: TestTree
 memoHyperSumNumDivisorsTests =
-  todoCode . testCase "memoHyperSumNumDivisors" $
+  testCase "memoHyperSumNumDivisors" $
     forM_ [1 .. 100] $ \n ->
       let mh :: UMemoHyper Int
           mh = memoHyperSumNumDivisors n
