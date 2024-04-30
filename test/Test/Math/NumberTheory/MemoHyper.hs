@@ -16,6 +16,7 @@ import Math.NumberTheory.MemoHyper
     memoHyperNumSquarefree,
     memoHyperPrimePhi,
     memoHyperPrimePi,
+    memoHyperPrimeSum,
     memoHyperRoughSum,
     memoHyperSumSquarefree,
     memoHyperSumTotient,
@@ -188,7 +189,25 @@ memoHyperPrimePhiTests =
        in mh @?= mhNaive
 
 memoHyperPrimeSumTests :: TestTree
-memoHyperPrimeSumTests = todoTest "memoHyperPrimeSum"
+memoHyperPrimeSumTests =
+  testCase "memoHyperPrimeSum" $
+    forM_ [1 .. 1000] $ \n ->
+      let mh :: UMemoHyper Word
+          mh = memoHyperPrimeSum n
+          mhNaive :: UMemoHyper Word
+          mhNaive =
+            let sq = integerSquareRoot n
+             in MemoHyper
+                  { mhLimit = n,
+                    mhSqrtLimit = integerSquareRoot n,
+                    mhFuncVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map (primeSumNaive . fromIntegral) [1 .. sq],
+                    mhHyperVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map (primeSumNaive . fromIntegral . (n `quot`)) [1 .. sq]
+                  }
+       in mh @?= mhNaive
 
 memoHyperRoughSumTests :: TestTree
 memoHyperRoughSumTests =
@@ -319,6 +338,12 @@ memoHyperIntegerSquareRootTests =
 --
 -- Utilities
 --
+
+primeSumNaive :: (Integral a) => a -> a
+primeSumNaive n = sum (filter isPrimeNaive [1 .. n])
+
+isPrimeNaive :: (Integral a) => a -> Bool
+isPrimeNaive n = length (filter (`divides` n) [1 .. n]) == 2
 
 -- Sum of the numbers <= n that aren't divisible by the first k primes
 roughSumNaive :: forall a. (Integral a) => a -> a -> a

@@ -624,8 +624,91 @@ memoHyperRoughSumST n = do
   freeze mh
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.primeSum'.
-memoHyperPrimeSum :: (G.Vector v a, Integral a) => Word -> MemoHyper v a
-memoHyperPrimeSum = todo
+memoHyperPrimeSum :: Word -> UMemoHyper Word
+memoHyperPrimeSum n = runST $ do
+  (roughSum_mmh :: UMMemoHyper s Word) <- MMemoHyper.new n
+  (primeSum_mmh :: UMMemoHyper s Word) <- MMemoHyper.new n
+  let sq = integerSquareRoot n
+  let ps = primesVec 0 sq
+  let sumOfPrimes = G.scanl (+) 0 ps
+  forM_ [1 .. sq] $ \i -> do
+    unsafeWriteSmall roughSum_mmh i (i * (i + 1) `quot` 2)
+    let nqi = n `quot` i
+    unsafeWriteHyper roughSum_mmh i (nqi * (nqi + 1) `quot` 2)
+  let ppi = primePiVec sq
+  let psum = primeSumVec sq
+  let bMax = ppi ! word2Int sq
+  let writeDone j = do
+        let j' :: Int
+            j' = word2Int j
+
+            doneIndicesLo :: [Word]
+            doneIndicesLo =
+              let low :: Word
+                  low = maybe minBound square (ps !? (j' - 1))
+
+                  high :: Word
+                  high = maybe maxBound square (ps !? j')
+               in [max 1 low .. min sq (high - 1)]
+
+            doneIndicesHi :: [Word]
+            doneIndicesHi =
+              let low :: Word
+                  low = maybe minBound ((n `quot`) . square) (ps !? j')
+
+                  high :: Word
+                  high = maybe maxBound ((n `quot`) . square) (ps !? (j' - 1))
+               in map (n `quot`) [max 1 (low + 1) .. min sq high]
+
+        forM_ doneIndicesLo $ \i -> do
+          roughSum <- unsafeReadSmall roughSum_mmh i
+          let pi' = psum `unsafeIndex` integerSquareRoot (word2Int i)
+          unsafeWriteSmall primeSum_mmh i (roughSum + pi' - 1)
+
+        forM_ doneIndicesHi $ \i -> do
+          let nqi = n `quot` i
+          phi <- unsafeReadHyper roughSum_mmh nqi
+          let pi' = psum `unsafeIndex` integerSquareRoot (word2Int i)
+          unsafeWriteHyper primeSum_mmh nqi (phi + pi' - 1)
+
+  writeDone 0
+  forM_ [1 .. bMax] $ \b -> do
+    let p = ps `unsafeIndex` (word2Int b - 1)
+    let iMin = square (ps `unsafeIndex` word2Int (b - 1))
+
+    let nqiMin = n `quot` iMin
+    let indices1 = [1 .. min sq nqiMin]
+    forM_ indices1 $ \nqi -> do
+      let iqp = n `quot` (nqi * p)
+      let tooBig = b > ppi `unsafeIndex` integerSquareRoot (word2Int iqp)
+      right <-
+        if tooBig
+          then do
+            pi_iqp <- unsafeReadHyper primeSum_mmh (nqi * p)
+            let corr = sumOfPrimes ! (word2Int b - 1)
+            pure $ pi_iqp - corr + 1
+          else unsafeReadHyper roughSum_mmh (nqi * p)
+      unsafeModifyHyper roughSum_mmh (\x -> x - p * right) nqi
+
+    let indices2 =
+          [sq, sq - 1 .. 1]
+            & zip (quotAll p sq)
+            & takeWhile ((>= iMin) . snd)
+
+    forM_ indices2 $ \(iqp, i) -> do
+      let tooBig = b > ppi `unsafeIndex` integerSquareRoot (word2Int iqp)
+      right <-
+        if tooBig
+          then do
+            psum_iqp <- unsafeReadSmall primeSum_mmh iqp
+            let corr = sumOfPrimes ! (word2Int b - 1)
+            pure $ psum_iqp - corr + 1
+          else unsafeReadSmall roughSum_mmh iqp
+      unsafeModifySmall roughSum_mmh (\x -> x - p * right) i
+
+    writeDone b
+
+  freeze primeSum_mmh
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Roots.integerSquareRoot'
 memoHyperIntegerSquareRoot ::
