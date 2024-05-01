@@ -57,6 +57,7 @@ module Math.NumberTheory.MemoHyper
 
     -- ** Miscellaneous
     memoHyperIntegerSquareRoot,
+    pow23,
   )
 where
 
