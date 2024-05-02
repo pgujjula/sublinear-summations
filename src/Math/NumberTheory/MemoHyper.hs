@@ -552,9 +552,13 @@ memoHyperSumNumDivisors n =
    in memoHyperSigmaHyper fromIntegral sumNumDivisorsList n
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumSumDivisors'.
-memoHyperSumSumDivisors ::
+memoHyperSumSumDivisors :: (Num a, G.Vector v a) => Word -> MemoHyper v a
+memoHyperSumSumDivisors = memoHyperSumSumDivisors_
+{-# INLINE memoHyperSumSumDivisors #-}
+
+memoHyperSumSumDivisors_ ::
   forall v a. (Num a, G.Vector v a) => Word -> MemoHyper v a
-memoHyperSumSumDivisors n =
+memoHyperSumSumDivisors_ n =
   let xs :: [a]
       xs =
         Chimera.toInfinite mobiusChimera

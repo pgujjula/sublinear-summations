@@ -132,7 +132,6 @@ hyperConvolveFast f hyper_sigma_f diff_g hyper_g n =
 --   \sum_{i = 1}^{n}
 --     \mu(i) f\left(\left\lfloor \frac{n}{i} \right\rfloor \right)\].
 hyperConvolveMobiusFast ::
-  forall b.
   (Num b) =>
   (Word -> b) ->
   (Word -> b) ->
