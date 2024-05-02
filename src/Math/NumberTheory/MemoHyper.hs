@@ -196,11 +196,11 @@ memoHyperDirect fh n =
 -- provided @'Math.NumberTheory.HyperbolicConvolution.hyper' n f@, a list of
 -- small values of @g@.
 memoHyperSigmaHyper ::
-  (G.Vector v b, Integral b) => (Word -> b) -> [b] -> Word -> MemoHyper v b
+  (G.Vector v b, Num b) => (Word -> b) -> [b] -> Word -> MemoHyper v b
 memoHyperSigmaHyper f vals n = runST (memoHyperSigmaHyperST f vals n)
 
 memoHyperSigmaHyperST ::
-  forall v s b. (G.Vector v b, Integral b) => (Word -> b) -> [b] -> Word -> ST s (MemoHyper v b)
+  forall v s b. (G.Vector v b, Num b) => (Word -> b) -> [b] -> Word -> ST s (MemoHyper v b)
 memoHyperSigmaHyperST f vals n = do
   let n23 :: Word
       n23 = pow23 n
@@ -266,11 +266,11 @@ memoHyperSigmaHyperST f vals n = do
 -- \(x \mapsto g \left(\left\lfloor \frac{n}{x} \right\rfloor\right)\),
 -- when provided @f@, and a list of small values of @g@.
 memoHyperSigmaMobiusHyper ::
-  (G.Vector v b, Integral b) => (Word -> b) -> [b] -> Word -> MemoHyper v b
+  (G.Vector v b, Num b) => (Word -> b) -> [b] -> Word -> MemoHyper v b
 memoHyperSigmaMobiusHyper f vals n = runST (memoHyperSigmaMobiusHyperST f vals n)
 
 memoHyperSigmaMobiusHyperST ::
-  forall v s b. (G.Vector v b, Integral b) => (Word -> b) -> [b] -> Word -> ST s (MemoHyper v b)
+  forall v s b. (G.Vector v b, Num b) => (Word -> b) -> [b] -> Word -> ST s (MemoHyper v b)
 memoHyperSigmaMobiusHyperST f vals n = do
   let n23 :: Word
       n23 = pow23 n
@@ -344,9 +344,10 @@ getIndices xs = go xs 0
 -- This function memoizes
 -- \(x \mapsto h \left(\left\lfloor \frac{n}{x} \right\rfloor\right)\),
 -- when provided a 'MemoHyper' for the 'sigma' of the Dirichlet inverse of @f@, an
--- implementation of @g@, and a list of small values of @h@.
+-- implementation of @g@, and a list of small values of @h@. Also, @f 1@ should
+-- be @1@.
 memoHyperHyperConvolve ::
-  (G.Vector u b, G.Vector v b, Integral b) =>
+  (G.Vector u b, G.Vector v b, Num b) =>
   MemoHyper u b ->
   (Word -> b) ->
   [b] ->
@@ -357,7 +358,7 @@ memoHyperHyperConvolve mhSigmaFInv g hVals n =
 
 memoHyperHyperConvolveST ::
   forall u v s b.
-  (G.Vector u b, G.Vector v b, Integral b) =>
+  (G.Vector u b, G.Vector v b, Num b) =>
   MemoHyper u b ->
   (Word -> b) ->
   [b] ->
@@ -424,10 +425,7 @@ memoHyperHyperConvolveST mhSigmaFInv g hVals n = do
             diff_hM
             hyperHPatched
             nqi
-        let fInv1 = unMemoHyper mhSigmaFInv n
-        pure $
-          (g nqi - conv)
-            `quot` fInv1
+        pure (g nqi - conv)
 
   fillLower hVals
   fillUpper hVals
@@ -476,7 +474,7 @@ unsafeFreeze mmh = do
 -- | Take @n@ and a recursive function @rec@. @rec@ takes a function @fh@ and an
 -- input @i@, where @fh j = f (n `quot` j)@ and returns @f (n `quot` i)@.
 memoHyperFixST ::
-  (G.Vector v a, Integral a) =>
+  (G.Vector v a, Num a) =>
   Word ->
   (forall s. (Word -> ST s a) -> Word -> ST s a) ->
   MemoHyper v a
@@ -505,7 +503,7 @@ pow23 x =
    in fromIntegral y'
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.mertens'.
-memoHyperMertens :: (G.Vector v a, Integral a) => Word -> MemoHyper v a
+memoHyperMertens :: (G.Vector v a, Num a) => Word -> MemoHyper v a
 memoHyperMertens n =
   let n23 :: Word
       n23 = pow23 n
@@ -532,14 +530,14 @@ memoHyperMertens n =
             pure (1 - s)
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumNumDivisors'.
-memoHyperSumNumDivisors :: (Integral a, G.Vector v a) => Word -> MemoHyper v a
+memoHyperSumNumDivisors :: (Num a, G.Vector v a) => Word -> MemoHyper v a
 memoHyperSumNumDivisors n =
   let sumNumDivisorsList =
         map fromIntegral (G.toList (G.scanl1 (+) (numDivisorsVec 1 n)))
    in memoHyperSigmaHyper fromIntegral sumNumDivisorsList n
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumSumDivisors'.
-memoHyperSumSumDivisors :: forall v a. (Integral a, G.Vector v a) => Word -> MemoHyper v a
+memoHyperSumSumDivisors :: forall v a. (Num a, G.Vector v a) => Word -> MemoHyper v a
 memoHyperSumSumDivisors n =
   let xs :: [a]
       xs =
@@ -564,7 +562,7 @@ memoHyperSumSumDivisors n =
    in memoHyperHyperConvolve mhSigmaFInv fromIntegral sumSumDivisorsList n
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumTotient'.
-memoHyperSumTotient :: (Integral a, G.Vector v a) => Word -> MemoHyper v a
+memoHyperSumTotient :: (Num a, G.Vector v a) => Word -> MemoHyper v a
 memoHyperSumTotient n =
   let n23 :: Word
       n23 = pow23 n
@@ -582,7 +580,7 @@ memoHyperSumTotient n =
                 else fromIntegral (sumTotient nqi)
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.numSquarefree'.
-memoHyperNumSquarefree :: (Integral a, G.Vector v a) => Word -> MemoHyper v a
+memoHyperNumSquarefree :: (Num a, G.Vector v a) => Word -> MemoHyper v a
 memoHyperNumSquarefree n =
   let n23 :: Word
       n23 = pow23 n
@@ -600,7 +598,7 @@ memoHyperNumSquarefree n =
                 else fromIntegral (numSquarefree nqi)
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumSquarefree'.
-memoHyperSumSquarefree :: (Integral a, G.Vector v a) => Word -> MemoHyper v a
+memoHyperSumSquarefree :: (Num a, G.Vector v a) => Word -> MemoHyper v a
 memoHyperSumSquarefree n =
   let n23 :: Word
       n23 = pow23 n
@@ -978,7 +976,7 @@ memoHyperPrimeSum n = runST $ do
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Roots.integerSquareRoot'
 memoHyperIntegerSquareRoot ::
-  (G.Vector v a, Integral a) => Word -> MemoHyper v a
+  (G.Vector v a, Num a) => Word -> MemoHyper v a
 memoHyperIntegerSquareRoot n =
   let sq = integerSquareRoot n
       fv = G.generate (word2Int sq) $ \i ->
