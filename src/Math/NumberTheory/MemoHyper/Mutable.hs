@@ -160,7 +160,8 @@ unsafeWriteHyper ::
 unsafeWriteHyper mmh i x =
   if i <= mmhSqrtLimit mmh
     then MVector.unsafeWrite (mmhHyperVec mmh) (toIndex i) x
-    else MVector.unsafeWrite (mmhFuncVec mmh) (toIndex (mmhLimit mmh `quot` i)) x
+    else
+      MVector.unsafeWrite (mmhFuncVec mmh) (toIndex (mmhLimit mmh `quot` i)) x
 {-# INLINE unsafeWriteHyper #-}
 
 unsafeWriteSmall ::
@@ -202,7 +203,8 @@ unsafeModifyHyper ::
 unsafeModifyHyper mmh f i =
   if i <= mmhSqrtLimit mmh
     then MVector.unsafeModify (mmhHyperVec mmh) f (toIndex i)
-    else MVector.unsafeModify (mmhFuncVec mmh) f (toIndex (mmhLimit mmh `quot` i))
+    else
+      MVector.unsafeModify (mmhFuncVec mmh) f (toIndex (mmhLimit mmh `quot` i))
 {-# INLINE unsafeModifyHyper #-}
 
 unsafeModifySmall ::

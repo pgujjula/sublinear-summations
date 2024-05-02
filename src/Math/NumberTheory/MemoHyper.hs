@@ -99,7 +99,11 @@ import Math.NumberTheory.MemoHyper.Mutable
 import Math.NumberTheory.MemoHyper.Mutable qualified as MMemoHyper
 import Math.NumberTheory.Mobius (mertensVec, mobius', mobiusChimera)
 import Math.NumberTheory.Roots (integerRoot, integerSquareRoot)
-import Math.NumberTheory.Summation.Internal (numSquarefree, sumSquarefree, sumTotient)
+import Math.NumberTheory.Summation.Internal
+  ( numSquarefree,
+    sumSquarefree,
+    sumTotient,
+  )
 import SublinearSummation.Util
   ( int2Word,
     primePiVec,
@@ -200,7 +204,12 @@ memoHyperSigmaHyper ::
 memoHyperSigmaHyper f vals n = runST (memoHyperSigmaHyperST f vals n)
 
 memoHyperSigmaHyperST ::
-  forall v s b. (G.Vector v b, Num b) => (Word -> b) -> [b] -> Word -> ST s (MemoHyper v b)
+  forall v s b.
+  (G.Vector v b, Num b) =>
+  (Word -> b) ->
+  [b] ->
+  Word ->
+  ST s (MemoHyper v b)
 memoHyperSigmaHyperST f vals n = do
   let n23 :: Word
       n23 = pow23 n
@@ -267,10 +276,16 @@ memoHyperSigmaHyperST f vals n = do
 -- when provided @f@, and a list of small values of @g@.
 memoHyperSigmaMobiusHyper ::
   (G.Vector v b, Num b) => (Word -> b) -> [b] -> Word -> MemoHyper v b
-memoHyperSigmaMobiusHyper f vals n = runST (memoHyperSigmaMobiusHyperST f vals n)
+memoHyperSigmaMobiusHyper f vals n =
+  runST (memoHyperSigmaMobiusHyperST f vals n)
 
 memoHyperSigmaMobiusHyperST ::
-  forall v s b. (G.Vector v b, Num b) => (Word -> b) -> [b] -> Word -> ST s (MemoHyper v b)
+  forall v s b.
+  (G.Vector v b, Num b) =>
+  (Word -> b) ->
+  [b] ->
+  Word ->
+  ST s (MemoHyper v b)
 memoHyperSigmaMobiusHyperST f vals n = do
   let n23 :: Word
       n23 = pow23 n
@@ -343,9 +358,9 @@ getIndices xs = go xs 0
 --     f(i) g\left(\left\lfloor \frac{n}{i} \right\rfloor\right)\]
 -- This function memoizes
 -- \(x \mapsto h \left(\left\lfloor \frac{n}{x} \right\rfloor\right)\),
--- when provided a 'MemoHyper' for the 'sigma' of the Dirichlet inverse of @f@, an
--- implementation of @g@, and a list of small values of @h@. Also, @f 1@ should
--- be @1@.
+-- when provided a 'MemoHyper' for the 'sigma' of the Dirichlet inverse of @f@,
+-- an implementation of @g@, and a list of small values of @h@. Also, @f 1@
+-- should be @1@.
 memoHyperHyperConvolve ::
   (G.Vector u b, G.Vector v b, Num b) =>
   MemoHyper u b ->
@@ -537,7 +552,8 @@ memoHyperSumNumDivisors n =
    in memoHyperSigmaHyper fromIntegral sumNumDivisorsList n
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.sumSumDivisors'.
-memoHyperSumSumDivisors :: forall v a. (Num a, G.Vector v a) => Word -> MemoHyper v a
+memoHyperSumSumDivisors ::
+  forall v a. (Num a, G.Vector v a) => Word -> MemoHyper v a
 memoHyperSumSumDivisors n =
   let xs :: [a]
       xs =

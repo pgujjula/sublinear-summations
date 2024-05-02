@@ -105,31 +105,41 @@ memoHyperSigmaHyperTests :: TestTree
 memoHyperSigmaHyperTests =
   testCase "memoHyperSigmaHyper" $
     forM_ [1000 .. 1000] $ \n -> do
-      forM_ [("const 1", const 1), ("id", word2Int), ("(2*", (2 *) . word2Int)] $ \(fName, f) -> do
-        let g :: Word -> Int
-            g m = sum (flip map [1 .. m] $ \i -> f (m `quot` i))
+      forM_
+        [ ("const 1", const 1),
+          ("id", word2Int),
+          ("(2*", (2 *) . word2Int)
+        ]
+        $ \(fName, f) -> do
+          let g :: Word -> Int
+              g m = sum (flip map [1 .. m] $ \i -> f (m `quot` i))
 
-            mh :: UMemoHyper Int
-            mh = memoHyperSigmaHyper f (map g [1 ..]) n
+              mh :: UMemoHyper Int
+              mh = memoHyperSigmaHyper f (map g [1 ..]) n
 
-            mhNaive :: UMemoHyper Int
-            mhNaive = memoHyper g n
-         in assertEqual (show (n, fName)) mhNaive mh
+              mhNaive :: UMemoHyper Int
+              mhNaive = memoHyper g n
+           in assertEqual (show (n, fName)) mhNaive mh
 
 memoHyperSigmaMobiusHyperTests :: TestTree
 memoHyperSigmaMobiusHyperTests =
   testCase "memoHyperSigmaMobiusHyper" $
     forM_ [1 .. 1000] $ \n -> do
-      forM_ [("const 1", const 1), ("id", word2Int), ("(2*", (2 *) . word2Int)] $ \(fName, f) -> do
-        let g :: Word -> Int
-            g m = sum (flip map [1 .. m] $ \i -> mobius' i * f (m `quot` i))
+      forM_
+        [ ("const 1", const 1),
+          ("id", word2Int),
+          ("(2*", (2 *) . word2Int)
+        ]
+        $ \(fName, f) -> do
+          let g :: Word -> Int
+              g m = sum (flip map [1 .. m] $ \i -> mobius' i * f (m `quot` i))
 
-            mh :: UMemoHyper Int
-            mh = memoHyperSigmaMobiusHyper f (map g [1 ..]) n
+              mh :: UMemoHyper Int
+              mh = memoHyperSigmaMobiusHyper f (map g [1 ..]) n
 
-            mhNaive :: UMemoHyper Int
-            mhNaive = memoHyper g n
-         in assertEqual (show (n, fName)) mhNaive mh
+              mhNaive :: UMemoHyper Int
+              mhNaive = memoHyper g n
+           in assertEqual (show (n, fName)) mhNaive mh
 
 memoHyperHyperConvolveTests :: TestTree
 memoHyperHyperConvolveTests =
@@ -306,7 +316,9 @@ memoHyperPrimeSumTests =
                         map (primeSumNaive . fromIntegral) [1 .. sq],
                     mhHyperVec =
                       Vector.fromListN (fromIntegral sq) $
-                        map (primeSumNaive . fromIntegral . (n `quot`)) [1 .. sq]
+                        map
+                          (primeSumNaive . fromIntegral . (n `quot`))
+                          [1 .. sq]
                   }
        in mh @?= mhNaive
 
@@ -383,7 +395,9 @@ memoHyperNumSquarefreeTests =
                         map (numSquarefreeNaive . fromIntegral) [1 .. sq],
                     mhHyperVec =
                       Vector.fromListN (fromIntegral sq) $
-                        map (numSquarefreeNaive . fromIntegral . (n `quot`)) [1 .. sq]
+                        map
+                          (numSquarefreeNaive . fromIntegral . (n `quot`))
+                          [1 .. sq]
                   }
        in mh @?= mhNaive
 
@@ -405,7 +419,9 @@ memoHyperSumSquarefreeTests =
                         map (sumSquarefreeNaive . fromIntegral) [1 .. sq],
                     mhHyperVec =
                       Vector.fromListN (fromIntegral sq) $
-                        map (sumSquarefreeNaive . fromIntegral . (n `quot`)) [1 .. sq]
+                        map
+                          (sumSquarefreeNaive . fromIntegral . (n `quot`))
+                          [1 .. sq]
                   }
        in mh @?= mhNaive
 

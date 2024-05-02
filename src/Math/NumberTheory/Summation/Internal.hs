@@ -61,7 +61,8 @@ sumSquarefree n =
             mobius' i * word2Int (i * i) * f (n' `quot` (i * i))
 
 -- | Let \(φ(n)\) be
--- [Euler's totient function](https://en.wikipedia.org/wiki/Euler%27s_totient_function),
+-- [Euler's totient function]
+-- (https://en.wikipedia.org/wiki/Euler%27s_totient_function),
 -- i.e., the number of positive integers ≤ @n@ that are relatively prime to @n@.
 -- Then @'sumTotient' n@ is the sum of \(φ\) from @1@ to @n@.
 sumTotient :: (Integral a) => a -> a
