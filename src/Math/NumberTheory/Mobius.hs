@@ -41,6 +41,7 @@ import SublinearSummation.Util (fromVectors, primes, primesVec, word2Int)
 --  Uses sharing.
 mobius' :: Word -> Int
 mobius' = Chimera.index mobiusChimera
+{-# INLINE mobius' #-}
 
 -- | Chimera of the mobius function
 mobiusChimera :: UChimera Int
@@ -129,6 +130,7 @@ mobiusVec' n m =
 -- | Compute the Mertens function. Uses sharing
 mertens' :: Word -> Int
 mertens' = Chimera.index mertensChimera
+{-# INLINE mertens' #-}
 
 -- | Chimera of the Mertens function
 
