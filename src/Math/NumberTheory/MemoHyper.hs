@@ -102,7 +102,6 @@ import Math.NumberTheory.Roots (integerRoot, integerSquareRoot)
 import Math.NumberTheory.Summation.Internal
   ( numSquarefree,
     sumSquarefree,
-    sumTotient,
   )
 import SublinearSummation.Util
   ( int2Word,
@@ -592,12 +591,31 @@ memoHyperSumTotient n =
 
       stotient :: Word -> Int
       stotient t = stvec ! word2Int t
+
+      mhMertens :: UMemoHyper Int
+      mhMertens = memoHyperMertens n
+
+      sumTotient_ :: Word -> Word -> Integer
+      sumTotient_ nqi i =
+        let square' :: Word -> Integer
+            square' x = let x' = fromIntegral x in x' * x'
+            {-# INLINE square' #-}
+
+            s =
+              fromIntegral $
+                hyperConvolveFast
+                  (fromIntegral . mobius')
+                  (fromIntegral . unMemoHyper mhMertens . (i *))
+                  (diff square')
+                  (hyper nqi square')
+                  nqi
+         in (s + 1) `quot` 2
    in memoHyperFixST n $ \_ i ->
         let nqi = n `quot` i
          in pure $
               if nqi <= n23
                 then fromIntegral (stotient nqi)
-                else fromIntegral (sumTotient nqi)
+                else fromIntegral (sumTotient_ nqi i)
 
 -- | A 'MemoHyper' for 'Math.NumberTheory.Summations.numSquarefree'.
 memoHyperNumSquarefree :: (Num a, G.Vector v a) => Word -> MemoHyper v a

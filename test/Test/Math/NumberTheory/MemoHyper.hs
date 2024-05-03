@@ -223,7 +223,7 @@ memoHyperSumSumDivisorsTests =
 
 memoHyperSumTotientTests :: TestTree
 memoHyperSumTotientTests =
-  testCase "memoHyperSumTotient" $
+  testCase "memoHyperSumTotient" $ do
     forM_ [1 .. 100] $ \n ->
       let mh :: UMemoHyper Int
           mh = memoHyperSumTotient n
@@ -244,6 +244,28 @@ memoHyperSumTotientTests =
                           [1 .. sq]
                   }
        in mh @?= mhNaive
+
+    forM_ [1 .. 100] $ \n ->
+      let mh :: VMemoHyper Integer
+          mh = memoHyperSumTotient n
+
+          mhNaive :: VMemoHyper Integer
+          mhNaive =
+            let sq = integerSquareRoot n
+             in MemoHyper
+                  { mhLimit = n,
+                    mhSqrtLimit = integerSquareRoot n,
+                    mhFuncVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map (sumTotientNaive . fromIntegral) [1 .. sq],
+                    mhHyperVec =
+                      Vector.fromListN (fromIntegral sq) $
+                        map
+                          (sumTotientNaive . fromIntegral . (n `quot`))
+                          [1 .. sq]
+                  }
+       in mh @?= mhNaive
+
 
 -- Primes
 
