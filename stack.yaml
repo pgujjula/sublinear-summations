@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Copyright Preetham Gujjula
 # SPDX-License-Identifier: BSD-3-Clause
 
-resolver: lts-22.18
+resolver: lts-22.43
 
 packages:
 - .
@@ -11,9 +11,6 @@ build:
     benchmark-arguments: "--color always"
 
 extra-deps:
-- github: ekmett/placeholder
-  commit: c958c36aed3c102cc6085b9126faee704fefc1b5
-- apply-merge-0.1.0.0
 - chimera-0.4.1.0
 - github: sighingnow/primesieve-haskell
   commit: f80d9cc7bae8c125dbf43a419b52d21c21d3ddbb
