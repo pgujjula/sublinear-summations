@@ -15,7 +15,7 @@ extra-deps:
   commit: c958c36aed3c102cc6085b9126faee704fefc1b5
 - apply-merge-0.1.0.0
 - chimera-0.4.1.0
-- github: sighingnow/computations
-  commit: cdd92c7c20a677282a7db3545a956494f3d61762
+- github: sighingnow/primesieve-haskell
+  commit: f80d9cc7bae8c125dbf43a419b52d21c21d3ddbb
   subdirs:
   - primesieve
