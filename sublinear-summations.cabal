@@ -18,8 +18,10 @@ copyright:      Preetham Gujjula
 license:        BSD-3-Clause
 build-type:     Simple
 tested-with:
-    GHC == 9.6.5
-  , GHC == 9.8.2
+    GHC == 9.6.7
+  , GHC == 9.8.4
+  , GHC == 9.10.1
+  , GHC == 9.12.2
 extra-doc-files:
     README.md
     ChangeLog.md
@@ -44,7 +46,7 @@ library
   ghc-options: -Wall -Wunused-packages
   build-depends:
       apply-merge
-    , base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
+    , base >=4.18 && <4.19 || >=4.19 && <4.20 || >=4.20 && <4.21 || >=4.21 && <4.22
     , call-stack
     , chimera
     , data-ordlist
@@ -69,7 +71,7 @@ test-suite sublinear-summations-tests
       test
   ghc-options: -Wall -Wunused-packages
   build-depends:
-      base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
+      base >=4.18 && <4.19 || >=4.19 && <4.20 || >=4.20 && <4.21 || >=4.21 && <4.22
     , chimera
     , integer-roots
     , primecount
@@ -95,7 +97,7 @@ benchmark apply-merge-benchmarks
       bench
   ghc-options: -Wall -Wunused-packages
   build-depends:
-      base >=4.16 && <4.17 || >=4.17 && <4.18 || >=4.18 && <4.19 || >=4.19 && <4.20
+      base >=4.18 && <4.19 || >=4.19 && <4.20 || >=4.20 && <4.21 || >=4.21 && <4.22
     , integer-roots
     , primecount
     , sublinear-summations
