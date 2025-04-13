@@ -266,7 +266,6 @@ memoHyperSumTotientTests =
                   }
        in mh @?= mhNaive
 
-
 -- Primes
 
 memoHyperPrimePiTests :: TestTree
