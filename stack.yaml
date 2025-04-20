@@ -14,6 +14,4 @@ build:
 extra-deps:
 - chimera-0.4.1.0
 - github: sighingnow/primesieve-haskell
-  commit: f80d9cc7bae8c125dbf43a419b52d21c21d3ddbb
-  subdirs:
-  - primesieve
+  commit: fbc769804a3be4daf349114cf4ef12920a25cc5b
